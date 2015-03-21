@@ -1,0 +1,28 @@
+!!! 5
+%html
+  %head
+    %script{ src: 'https://code.jquery.com/jquery-2.1.3.min.js' }
+  %body
+    %input{ id: 'search' }
+    #query
+    #results
+    :javascript
+      $("#search").focus();
+
+      var search = function(query) {
+        $.post('/search', {
+          query: query
+        }, function(data, status, xhr) {
+          $('#query').html('<h2>results for ' + data.search.join(' ') + '</h2>');
+          $("#results").html('');
+          for (i in data.results) {
+            $("#results").append("<div><img width=200 src='" + data.results[i].path + "' /><br />" + data.results[i].tokens.join(' ') + "</div>");
+          }
+          console.log(data);
+          $('#results').append(data.results);
+        });
+      }
+
+      $('#search').on('keyup', function(e) {
+        search(e.target.value);
+      });
