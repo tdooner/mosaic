@@ -6,21 +6,22 @@ class SketchFile < ActiveRecord::Base
   def self.sync_all
     update_all(in_sync: false)
 
-    SketchSyncDropbox.with_client do |client|
-      results = client.search('/design', '.sketch')
-      results.each do |res|
-        next if res['bytes'] == 0
-        next if res['is_dir']
-        next if res['path'] =~ /conflicted copy/
+    results = SketchSyncDropbox.with_client do |client|
+      client.search('/design', '.sketch')
+    end
 
-        sfile = where(dropbox_path: res['path'].lower)
-                 .first_or_create(dropbox_rev: 'unknown')
+    results.each do |res|
+      next if res['bytes'] == 0
+      next if res['is_dir']
+      next if res['path'] =~ /conflicted copy/
 
-        if sfile.rev == res['rev']
-          sfile.update_attribute(:in_sync, true)
-        else
-          Threaded.enqueue(SyncWorker, sketch_file.id)
-        end
+      sfile = where(dropbox_path: res['path'].downcase)
+               .first_or_create(dropbox_rev: 'unknown')
+
+      if sfile.dropbox_rev == res['rev']
+        sfile.update_attribute(:in_sync, true)
+      else
+        Threaded.enqueue(SyncWorker, sfile.id)
       end
     end
   end
@@ -31,25 +32,19 @@ class SketchFile < ActiveRecord::Base
     def self.call(id)
       sfile = SketchFile.find(id)
 
+      sfile_directory = sfile.dropbox_path.gsub(/\.sketch$/, '').scan(/\w+/).join('-')
+      FileUtils.mkdir_p(File.join('images', sfile_directory))
+
       $logger.info 'fetching ' + sfile.dropbox_path
-
-      new_directory = sfile.dropbox_path.gsub(/\.sketch$/, '').scan(/\w+/)
-      local_parent_dir = File.join(
-        File.expand_path('../../images', __FILE__),
-        new_directory
-      )
-
-      $logger.info '  into ' + local_parent_dir
-
-      FileUtils.mkdir_p(local_parent_dir)
+      $logger.info '  into ' + sfile_directory
 
       Dir.mktmpdir do |tmp|
         metadata = {}
 
         File.open("#{tmp}/download.sketch", 'w') do |f|
           SketchSyncDropbox.with_client do |client|
-            metadata = client.metadata(dropbox_path)
-            # f.write client.get_file(dropbox_path)
+            metadata = client.metadata(sfile.dropbox_path)
+            f.write client.get_file(sfile.dropbox_path)
           end
         end
 
@@ -65,12 +60,22 @@ class SketchFile < ActiveRecord::Base
             # TODO: Refactor this, there's way too much path munging happening
             # here.
             layer_name = f.gsub("#{tmp}/", '').gsub(/\.png$/, '')
-            new_filename = layer_name.scan(/\w+/).join(' ') + '.png'
-            FileUtils.mv(f, File.join(local_parent_dir, new_filename))
-            sfile.slices.create(path: File.join(new_directory, new_filename), layer: layer_name)
+            new_filename = layer_name.scan(/\w+/).join('-') + '.png'
+            new_filename_with_path = File.join('images', sfile_directory, new_filename)
+
+            FileUtils.mv(f, new_filename_with_path)
+
+            sfile.slices.create(
+              path: '/' + new_filename_with_path,
+              layer: layer_name
+            )
           end
 
-          sfile.update_attributes(in_sync: true, dropbox_rev: metadata['rev'], last_modified: Time.parse(metadata['modified']))
+          sfile.update_attributes(
+            in_sync: true,
+            dropbox_rev: metadata['rev'],
+            last_modified: Time.parse(metadata['modified'])
+          )
         end
       end
     rescue => ex

@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'active_record'
+gem 'activerecord'
 gem 'dotenv'
 gem 'dropbox-sdk'
 gem 'haml'

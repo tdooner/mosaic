@@ -34,6 +34,7 @@ configure do
 
   Threaded.logger = $logger
   Threaded.inline = false
+  Threaded.size = 3
   Threaded.start
 
   SketchFile.sync_all
@@ -44,7 +45,7 @@ get '/' do
 end
 
 post '/search' do
-  results = Slice.find_by_search(params[:query]).includes(:sketch_file)
+  results = Slice.find_by_search(params[:query]).includes(:sketch_file).limit(20)
 
   json({
     search: [params[:query]],
