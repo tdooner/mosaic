@@ -4,8 +4,24 @@ class SketchFile < ActiveRecord::Base
   scope :in_sync, -> { where(in_sync: true) }
 
   def self.sync_all
-    find_each do |sketch_file|
-      Threaded.enqueue(SyncWorker, sketch_file.id)
+    update_all(in_sync: false)
+
+    SketchSyncDropbox.with_client do |client|
+      results = client.search('/design', '.sketch')
+      results.each do |res|
+        next if res['bytes'] == 0
+        next if res['is_dir']
+        next if res['path'] =~ /conflicted copy/
+
+        sfile = where(dropbox_path: res['path'].lower)
+                 .first_or_create(dropbox_rev: 'unknown')
+
+        if sfile.rev == res['rev']
+          sfile.update_attribute(:in_sync, true)
+        else
+          Threaded.enqueue(SyncWorker, sketch_file.id)
+        end
+      end
     end
   end
 
@@ -17,9 +33,10 @@ class SketchFile < ActiveRecord::Base
 
       $logger.info 'fetching ' + sfile.dropbox_path
 
+      new_directory = sfile.dropbox_path.gsub(/\.sketch$/, '').scan(/\w+/)
       local_parent_dir = File.join(
         File.expand_path('../../images', __FILE__),
-        sfile.dropbox_path.gsub(/\.sketch$/, '').scan(/\w+/)
+        new_directory
       )
 
       $logger.info '  into ' + local_parent_dir
@@ -27,32 +44,33 @@ class SketchFile < ActiveRecord::Base
       FileUtils.mkdir_p(local_parent_dir)
 
       Dir.mktmpdir do |tmp|
+        metadata = {}
+
         File.open("#{tmp}/download.sketch", 'w') do |f|
           SketchSyncDropbox.with_client do |client|
-            sleep Random.rand(10)
+            metadata = client.metadata(dropbox_path)
             # f.write client.get_file(dropbox_path)
           end
         end
 
-        # TODO: Make this actually do stuff (on mac)
-        # `cd #{tmp} && #{APP_PATH}/vendor/sketchtool/bin/sketchtool export slices download.sketch`
+        sketchtool_path = File.expand_path('../../vendor/sketchtool', __FILE__)
+        `cd #{tmp} && #{sketchtool_path}/bin/sketchtool export slices download.sketch`
 
         sfile.transaction do
           sfile.slices.delete_all
 
-          # TODO: Uncomment this too
-          # files = Dir["**/*.png"]
-          files = Dir["/mnt/ssd/tom/dev/ruby/sketch-sync/images/**/*.png"].sample(10)
+          files = Dir["#{tmp}/**/*.png"]
 
           files.map do |f|
-            # TODO: Uncomment on Mac
-            # new_filename = File.join(new_files_path, tokens.join('-') + '.png')
-            # FileUtils.mv(file, new_filename)
-            new_filename = f.gsub('/mnt/ssd/tom/dev/ruby/sketch-sync', '')
-            sfile.slices.create(path: new_filename, layer: ['Slice 3', 'Campaign Screener Positions', 'Mobile Other 3', 'Position Written'].sample)
+            # TODO: Refactor this, there's way too much path munging happening
+            # here.
+            layer_name = f.gsub("#{tmp}/", '').gsub(/\.png$/, '')
+            new_filename = layer_name.scan(/\w+/).join(' ') + '.png'
+            FileUtils.mv(f, File.join(local_parent_dir, new_filename))
+            sfile.slices.create(path: File.join(new_directory, new_filename), layer: layer_name)
           end
 
-          sfile.update_attribute(:in_sync, true)
+          sfile.update_attributes(in_sync: true, dropbox_rev: metadata['rev'], last_modified: Time.parse(metadata['modified']))
         end
       end
     rescue => ex
