@@ -1,0 +1,49 @@
+body, html {
+  margin: 0;
+  padding: 0;
+}
+
+/* TODO: Use flexbox for this so the box can be big and pretty */
+#search-container {
+  padding: 20px 100px;
+  box-sizing: border-box;
+  width: 100%;
+  background-color: #000;
+  color: #fff;
+  font-size: 24px;
+}
+
+#search {
+  background-color: #000;
+  border: 0;
+  color: #fff;
+  font-size: 24px;
+  margin-left: 1em;
+}
+
+.result {
+  width: 300px;
+  float: left;
+  background-size: cover;
+  height: 375px;
+  margin: 32px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.result-filename, .result-slice {
+  font-weight: bold;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.6);
+  margin: 0px;
+}
+
+.result-filename {
+  font-size: 24px;
+}
+
+.result-slice {
+  font-size: 18px;
+}

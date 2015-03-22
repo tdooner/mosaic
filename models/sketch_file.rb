@@ -49,7 +49,7 @@ class SketchFile < ActiveRecord::Base
             # new_filename = File.join(new_files_path, tokens.join('-') + '.png')
             # FileUtils.mv(file, new_filename)
             new_filename = f.gsub('/mnt/ssd/tom/dev/ruby/sketch-sync', '')
-            sfile.slices.create(path: new_filename, layer: f)
+            sfile.slices.create(path: new_filename, layer: ['Slice 3', 'Campaign Screener Positions', 'Mobile Other 3', 'Position Written'].sample)
           end
 
           sfile.update_attribute(:in_sync, true)

@@ -6,6 +6,6 @@ class Slice < ActiveRecord::Base
     search_tokens.map! { |t| "#{t}*" }
 
     # TODO: Parameterize this query:
-    find_by_sql("SELECT * FROM slices WHERE slices MATCH \"#{search_tokens.join(' ')}\";")
+    where('slices MATCH ?', search_tokens.join(' '))
   end
 end

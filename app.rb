@@ -84,11 +84,11 @@ get '/' do
 end
 
 post '/search' do
-  results = Slice.find_by_search(params[:query])
+  results = Slice.find_by_search(params[:query]).includes(:sketch_file)
 
   json({
     search: [params[:query]],
-    results: results.map { |r| { path: r.path, layer: r.layer, tokens: []} }
+    results: results.map { |r| { image_url: r.path, dropbox_url: r.sketch_file.dropbox_path, layer: r.layer } }
   })
 end
 
