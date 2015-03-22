@@ -3,10 +3,26 @@
   %head
     %script{ src: 'https://code.jquery.com/jquery-2.1.3.min.js' }
   %body
+    Status:
+    %span#status
+      Loading..
+    %br
     %input{ id: 'search' }
     #query
     #results
     :javascript
+      // This thing checks for the status
+      var updateStatus = function() {
+        $.getJSON('/status', {}, function(data, textStatus, xhr) {
+          $("#status").html("<b>" + data.in_sync + "</b> / " + data.files + " files in sync");
+          if (data.in_sync != data.files) {
+            window.setTimeout(updateStatus, 200);
+          }
+        });
+      }
+      updateStatus();
+
+      // It's all about search of course!
       $("#search").focus();
 
       var search = function(query) {

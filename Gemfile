@@ -1,7 +1,10 @@
 source 'https://rubygems.org'
 
+gem 'active_record'
+gem 'dotenv'
 gem 'dropbox-sdk'
 gem 'haml'
 gem 'sinatra'
 gem 'sinatra-contrib'
 gem 'sqlite3'
+gem 'threaded'
