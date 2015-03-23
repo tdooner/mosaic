@@ -14,19 +14,6 @@ $logger = Logger.new(STDOUT)
 # TODO: Fix this to only be images/
 set :public_folder, '.'
 
-# def index_changes(changes)
-#   Slice.transaction do
-#     changes.each do |change|
-#       s = SketchFile.where(dropbox_path: change[:original_path]).first_or_create(dropbox_rev: change[:rev])
-#       Slice.where(
-#         sketch_file: s,
-#         path: change[:path],
-#         layer: change[:layer_tokens].join(' ')
-#       ).first_or_create
-#     end
-#   end
-# end
-
 configure do
   ActiveRecord::Base.logger = $logger
   SketchSyncDropbox.authenticate!(ENV['DROPBOX_APP_KEY'], ENV['DROPBOX_APP_SECRET'])
@@ -45,11 +32,21 @@ get '/' do
 end
 
 post '/search' do
-  results = Slice.find_by_search(params[:query]).includes(:sketch_file).limit(20)
+  # TODO: Make this more sane
+  recent_results = Slice.find_by_search(params[:query]).recently_modified
+  results = Slice.find_by_search(params[:query]).not_recently_modified
+
+  results_by_file_id = (recent_results + results).group_by(&:sketch_file_id)
+  results = results.sort_by { |s| results_by_file_id[s.sketch_file_id].count }.reverse
+
+  files = SketchFile.where(id: results_by_file_id.keys.uniq).group_by(&:id)
 
   json({
     search: [params[:query]],
-    results: results.map { |r| { image_url: r.path, dropbox_url: r.sketch_file.dropbox_path, layer: r.layer } }
+    results: (recent_results + results).group_by(&:sketch_file_id).map do |file_id, slices|
+      file = files[file_id].first
+      { file: file.dropbox_path, file_id: file.id, last_modified: file.last_modified, slices: slices }
+    end
   })
 end
 
@@ -58,6 +55,15 @@ get '/status' do
     files: SketchFile.count,
     in_sync: SketchFile.in_sync.count
   })
+end
+
+get '/download/:file_id' do |file_id|
+  file = SketchFile.find(file_id)
+  media = SketchSyncDropbox.with_client do |client|
+    client.shares(file.dropbox_path)
+  end
+
+  redirect media['url']
 end
 
 after do
