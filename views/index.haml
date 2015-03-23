@@ -20,10 +20,41 @@
       -# this creates a margin
 
     .container
+      #no-results.row
+        .col-xs-12
+          %h2 Welcome to the Design Nexus
+          %span{ style: 'font-size: 96px' }
+            %i.fa.fa-diamond{ style: 'color: #ecb22f' }
+            %i.fa.fa-arrow-right{ style: 'opacity: 0.2' }
+            %i.fa.fa-dropbox{ style: 'color: #3277e3' }
+            %i.fa.fa-arrow-right{ style: 'opacity: 0.2' }
+            %i.fa.fa-thumbs-o-up{ style: 'color: #009900;' }
+
+          %h3 How it works:
+          %p
+            Every
+            %b .sketch
+            file in the Design dropbox is being watched. When an
+            update happens, this app will fetch the new version and export all
+            the slices into separate PNGs.
+
+          %p
+            All PNGs are searchable by name, with the link back to the original
+            design file in Dropbox.
+
+          %h3 Try some search queries:
+          %ul
+            %li "partner tools"
+            %li "ribbon"
+            %li "profile android"
+            %li "support button"
+            %li "delight card"
+
       #results
 
       .row
-        %p#status-container
-          Status:
-          %span#status
-            Loading..
+        .col-xs-12
+          %p#status-container
+            Status:
+            %span#status
+              Loading..

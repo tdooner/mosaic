@@ -1,7 +1,7 @@
 // This thing checks for the status
 var updateStatus = function() {
   $.getJSON('/status', {}, function(data, textStatus, xhr) {
-    $("#status").html("<b>" + data.in_sync + "</b> / " + data.files + " files in sync");
+    $("#status").html("<b>" + data.in_sync + "</b> / " + data.files + " sketch files in sync");
     if (data.in_sync != data.files) {
       window.setTimeout(updateStatus, 2000);
     }
@@ -10,10 +10,18 @@ var updateStatus = function() {
 
 var search = function(query) {
   $(window).scrollTop(0);
+  if (query.length == 0) {
+    $("#no-results").show();
+    $("#results").html('');
+    return;
+  }
   $.post('/search', {
     query: query
   }, function(data, status, xhr) {
+    $("#no-results").hide();
     $("#results").html('');
+
+    var slicesShown = 0;
 
     for (var i in data.results) {
       var result = data.results[i];
@@ -26,8 +34,9 @@ var search = function(query) {
             "<span><a target='_new' href='/download/" + result.file_id + "'>Download from Dropbox</a></span>" +
           "</div>" + result.slices.map(function(slice) {
         var thumb_url = slice.path.replace('.png', '.thumb.jpg'),
-            image_attr = (i < 2) ? "src='" + thumb_url + "'" : "data-original='" + thumb_url + "'";
-        ;
+            image_attr = (slicesShown < 6) ? "src='" + thumb_url + "'" : "data-original='" + thumb_url + "'";
+        slicesShown += 1;
+
         return "<div class='result-slice col-xs-4'><a href='" + slice.path + "' target='_new'><h3 class='result-slice-layer-title'>" + slice.layer + "</h3><img " + image_attr + " /></a></div>";
       }).join(' ') + "</div>");
     }
@@ -86,6 +95,9 @@ $(function() {
       $("#search").focus(); // fake it till you make it!
     } else {
       $(window).scrollTop(0);
+      setTimeout(function() {
+        $("#search").focus(); // fake it till you make it!
+      }, 100);
     }
   });
   $("#search").focus();

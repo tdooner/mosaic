@@ -43,7 +43,7 @@ post '/search' do
 
   json({
     search: [params[:query]],
-    results: (recent_results + results).group_by(&:sketch_file_id).map do |file_id, slices|
+    results: (recent_results + results).first(300).group_by(&:sketch_file_id).map do |file_id, slices|
       file = files[file_id].first
       { file: file.dropbox_path, file_id: file.id, last_modified: file.last_modified, slices: slices }
     end

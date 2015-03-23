@@ -5,28 +5,39 @@ class SketchFile < ActiveRecord::Base
 
   def self.sync_all
     update_all(in_sync: false)
-
-    results = SketchSyncDropbox.with_client do |client|
-      client.search('/design', '.sketch')
-    end
-
-    results.each do |res|
-      next if res['bytes'] == 0
-      next if res['is_dir']
-      next if res['path'] =~ /conflicted copy/
-
-      sfile = where(dropbox_path: res['path'].downcase)
-               .first_or_create(dropbox_rev: 'unknown')
-
-      if sfile.dropbox_rev == res['rev']
-        sfile.update_attribute(:in_sync, true)
-      else
-        Threaded.enqueue(SyncWorker, sfile.id)
-      end
-    end
+    Threaded.enqueue(StartSyncManagerThread)
   end
 
   private
+
+  class StartSyncManagerThread
+    def self.call
+      $logger.info 'Syncronizing with Dropbox...'
+      results = SketchSyncDropbox.with_client do |client|
+        client.search('/design', '.sketch')
+      end
+
+      results.each do |res|
+        next if res['bytes'] == 0
+        next if res['is_dir']
+        next if res['path'] =~ /conflicted copy/
+
+        sfile = SketchFile
+                 .where(dropbox_path: res['path'].downcase)
+                 .first_or_create(dropbox_rev: 'unknown')
+
+        if sfile.dropbox_rev == res['rev']
+          sfile.update_attribute(:in_sync, true)
+        else
+          Threaded.enqueue(SyncWorker, sfile.id)
+        end
+      end
+
+      sleep 60
+
+      Threaded.enqueue(self)
+    end
+  end
 
   class SyncWorker
     def self.call(id)

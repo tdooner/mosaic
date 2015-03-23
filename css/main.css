@@ -42,6 +42,7 @@ body, html {
   color: #fff;
   font-size: 24px;
   margin-left: 1em;
+  outline: none;
 }
 
 .result-filename {
