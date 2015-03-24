@@ -8,18 +8,30 @@ var updateStatus = function() {
   });
 }
 
-var search = function(query) {
-  $(window).scrollTop(0);
-  if (query.length == 0) {
+var clearSearchResults = function() {
+  if ($("#search").val().length == 0) {
     $("#no-results").show();
     $("#results").html('');
+    return true;
+  }
+
+  return false;
+}
+
+var search = function(query) {
+  if (clearSearchResults()) {
     return;
   }
+  $(window).scrollTop(0);
   $.post('/search', {
     query: query
   }, function(data, status, xhr) {
     $("#no-results").hide();
     $("#results").html('');
+
+    if (clearSearchResults()) {
+      return;
+    }
 
     var slicesShown = 0;
 
