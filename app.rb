@@ -31,6 +31,10 @@ get '/' do
   haml :index
 end
 
+get '/tags' do
+  haml :tags
+end
+
 post '/search' do
   # TODO: Make this more sane
   recent_results = Slice.find_by_search(params[:query]).recently_modified

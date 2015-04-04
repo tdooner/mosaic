@@ -1,60 +1,38 @@
-!!! 5
-%html
-  %head
-    %script{ src: 'https://code.jquery.com/jquery-2.1.3.min.js' }
-    %script{ src: '/js/main.js' }
-    %script{ src: '/vendor/js/javascript-relative-time-helpers/date.extensions.js' }
-    %script{ src: '/vendor/js/jquery_lazyload/jquery.lazyload.min.js' }
-    %link{ rel: 'stylesheet', type: 'text/css', href: 'css/main.css' }
-    %link{ rel: 'stylesheet', href: '//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css' }
-    %link{ rel: 'stylesheet', href: '//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css' }
-  %body
-    .sticky-header.search-mode#search-container
-      .container
-        .row
-          %i.fa.fa-search.search-icon
-          %span.search-or-filename
-            %input#search{ autocomplete: 'off' }
-            %span#filename
-    #search-container-spacer
-      -# this creates a margin
+#no-results.row
+  .col-xs-12
+    %h2 Welcome to Mosaic
+    %span{ style: 'font-size: 96px' }
+      %i.fa.fa-diamond{ style: 'color: #ecb22f' }
+      %i.fa.fa-arrow-right{ style: 'opacity: 0.2' }
+      %i.fa.fa-dropbox{ style: 'color: #3277e3' }
+      %i.fa.fa-arrow-right{ style: 'opacity: 0.2' }
+      %i.fa.fa-thumbs-o-up{ style: 'color: #009900;' }
 
-    .container
-      #no-results.row
-        .col-xs-12
-          %h2 Welcome to Mosaic
-          %span{ style: 'font-size: 96px' }
-            %i.fa.fa-diamond{ style: 'color: #ecb22f' }
-            %i.fa.fa-arrow-right{ style: 'opacity: 0.2' }
-            %i.fa.fa-dropbox{ style: 'color: #3277e3' }
-            %i.fa.fa-arrow-right{ style: 'opacity: 0.2' }
-            %i.fa.fa-thumbs-o-up{ style: 'color: #009900;' }
+    %h3 How it works:
+    %p
+      Every
+      %b .sketch
+      file in the Design dropbox is being watched. When an
+      update happens, this app will fetch the new version and export all
+      the slices into separate PNGs.
 
-          %h3 How it works:
-          %p
-            Every
-            %b .sketch
-            file in the Design dropbox is being watched. When an
-            update happens, this app will fetch the new version and export all
-            the slices into separate PNGs.
+    %p
+      All PNGs are searchable by name, with the link back to the original
+      design file in Dropbox.
 
-          %p
-            All PNGs are searchable by name, with the link back to the original
-            design file in Dropbox.
+    %h3 Try some search queries:
+    %ul
+      %li "partner tools"
+      %li "ribbon"
+      %li "profile android"
+      %li "support button"
+      %li "delight card"
 
-          %h3 Try some search queries:
-          %ul
-            %li "partner tools"
-            %li "ribbon"
-            %li "profile android"
-            %li "support button"
-            %li "delight card"
+#results
 
-      #results
-
-      .row
-        .col-xs-12
-          %p#status-container
-            Status:
-            %span#status
-              Loading..
+.row
+  .col-xs-12
+    %p#status-container
+      Status:
+      %span#status
+        Loading..
