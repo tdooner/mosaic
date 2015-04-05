@@ -4,6 +4,13 @@ ActiveRecord::Schema.define do
     t.string :dropbox_rev
     t.datetime :last_modified
     t.boolean :in_sync, default: 0, null: false
+    t.string :tag_cache
+  end
+
+  create_table :taggings do |t|
+    t.string :type, null: false
+    t.integer :weight, null: false
+    t.string :dropbox_path, null: false
   end
 
   execute <<-SQL.strip

@@ -1,1 +1,7 @@
-TODO implement tag management options
+%ul.list-group
+  - num_files_by_path.each do |path, num_files|
+    %div.list-group-item{ data: { path: path } }
+      %span.badge= num_files
+      %p= path
+      - Tagging.types.each do |tag|
+        %a.btn.btn-default.tag-button{ class: ('btn-success' if taggings.include?([path, tag.to_s])), data: { tag: tag } }= tag

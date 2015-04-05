@@ -38,12 +38,18 @@ var search = function(query) {
     for (var i in data.results) {
       var result = data.results[i];
       result.basename = result.file.split('/').pop();
+      result_info = []
+      result_info.push("<span><i class='fa fa-clock-o'></i> " + new Date(result.last_modified).toRelativeTime() + "</span>");
+      if (result.tags.length > 0) {
+        result_info.push("<span>" + result.tags.join(', ') + "</span>");
+      }
+      result_info.push("<span><a target='_new' href='/download/" + result.file_id + "'>Download from Dropbox</a></span>");
+
       $("#results").append(
         "<div class='result-file row'>" +
           "<div class='result-filename-container'>" +
             "<h2 class='result-filename'><i class='fa fa-file-image-o'></i> " + result.basename + "</h2>" +
-            "<span><i class='fa fa-clock-o'></i> " + new Date(result.last_modified).toRelativeTime() + "</span> &middot; " +
-            "<span><a target='_new' href='/download/" + result.file_id + "'>Download from Dropbox</a></span>" +
+            result_info.join(" &middot; ") +
           "</div>" + result.slices.map(function(slice) {
         var thumb_url = slice.path.replace('.png', '.thumb.jpg'),
             image_attr = (slicesShown < 6) ? "src='" + thumb_url + "'" : "data-original='" + thumb_url + "'";
@@ -98,8 +104,35 @@ var handleScroll = function(e) {
   }
 };
 
+var setTagClickHandlers = function() {
+  var tagClickHandler = function(e) {
+    $.post('/tags', {
+        tag: $(e.target).data('tag'),
+        path: $(e.target).closest('.list-group-item').data('path')
+      }, function(data, success, xhr) {
+        $(e.target).closest('.list-group-item').find('.tag-button').each(function(button) {
+          var tag = $(this).data('tag');
+          var anyFound = false;
+
+          for (var i in data) {
+            if (data[i].type === tag) {
+              anyFound = true;
+            }
+          }
+
+          $(this).toggleClass('btn-success', anyFound);
+        })
+    });
+  };
+
+  $(function() {
+    $('.tag-button').on('click', tagClickHandler);
+  });
+}
+
 $(function() {
   updateStatus();
+  setTagClickHandlers();
 
   // It's all about search of course!
   $("#search-container").on('click', function(e) {
