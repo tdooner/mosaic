@@ -1,13 +1,10 @@
 !!! 5
 %html
   %head
-    %script{ src: 'https://code.jquery.com/jquery-2.1.3.min.js' }
-    %script{ src: '/js/main.js' }
-    %script{ src: '/vendor/js/javascript-relative-time-helpers/date.extensions.js' }
-    %script{ src: '/vendor/js/jquery_lazyload/jquery.lazyload.min.js' }
     %link{ rel: 'stylesheet', type: 'text/css', href: 'css/main.css' }
     %link{ rel: 'stylesheet', href: '//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css' }
     %link{ rel: 'stylesheet', href: '//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css' }
+
   %body
     .sticky-header.search-mode#search-container
       .container
@@ -21,3 +18,8 @@
 
     .container
       = yield
+
+    %script{ src: 'https://code.jquery.com/jquery-2.1.3.min.js' }
+    %script{ src: '/vendor/js/javascript-relative-time-helpers/date.extensions.js' }
+    %script{ src: '/vendor/js/jquery_lazyload/jquery.lazyload.min.js' }
+    %script{ src: '/js/main.js' }
