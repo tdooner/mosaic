@@ -69,7 +69,7 @@ class SketchFile < ActiveRecord::Base
         end
 
         sketchtool_path = File.expand_path('../../vendor/sketchtool', __FILE__)
-        command_env = { cwd: tmp, timeout: 120 }
+        command_env = { cwd: tmp, timeout: 5 * 60 }
 
         $logger.info "[#{id}] attempting to determine number of slices..."
         slice_info = Mixlib::ShellOut.new("#{sketchtool_path}/bin/sketchtool list slices download.sketch", command_env)
