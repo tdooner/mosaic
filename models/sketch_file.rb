@@ -27,6 +27,15 @@ class SketchFile < ActiveRecord::Base
         client.search('/design', '.sketch')
       end
 
+      $logger.info "found #{results.length} *.sketch files in Dropbox"
+      dead_files = SketchFile.where.not(dropbox_path: results.map { |r| r['path'] }).pluck(:id)
+      $logger.info "Mosaic contains #{dead_files.length} files that no longer exist"
+
+      # TODO: This can't use `dependent: :destroy` because there is no primary
+      # key on `slices` (oops.) I should add one.
+      SketchFile.where(id: dead_files).delete_all
+      Slice.where(sketch_file_id: dead_files).delete_all
+
       results.each do |res|
         next if res['bytes'] == 0
         next if res['is_dir']
