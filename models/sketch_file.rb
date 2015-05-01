@@ -1,8 +1,10 @@
 require 'mixlib/shellout'
 
 class SketchFile < ActiveRecord::Base
-  has_many :slices, dependent: :destroy
+  has_many :slices, dependent: :destroy, inverse_of: :sketch_file
   scope :in_sync, -> { where(in_sync: true) }
+  scope :with_path, ->(path) { where(dropbox_path: path.downcase) }
+  scope :with_paths, ->(paths) { where(dropbox_path: paths.map(&:downcase)) }
 
   before_save :update_tag_cache
   serialize :tag_cache
@@ -28,13 +30,10 @@ class SketchFile < ActiveRecord::Base
       end
 
       $logger.info "found #{results.length} *.sketch files in Dropbox"
-      dead_files = SketchFile.where.not(dropbox_path: results.map { |r| r['path'] }).pluck(:id)
+      alive_files = SketchFile.with_paths(results.map { |r| r['path'] }).pluck(:id)
+      dead_files = SketchFile.where.not(id: alive_files)
       $logger.info "Mosaic contains #{dead_files.length} files that no longer exist"
-
-      # TODO: This can't use `dependent: :destroy` because there is no primary
-      # key on `slices` (oops.) I should add one.
-      SketchFile.where(id: dead_files).delete_all
-      Slice.where(sketch_file_id: dead_files).delete_all
+      dead_files.destroy_all
 
       results.each do |res|
         next if res['bytes'] == 0
@@ -42,7 +41,7 @@ class SketchFile < ActiveRecord::Base
         next if res['path'] =~ /conflicted copy/
 
         sfile = SketchFile
-                 .where(dropbox_path: res['path'].downcase)
+                 .with_path(res['path'])
                  .first_or_create(dropbox_rev: 'unknown')
 
         if sfile.dropbox_rev == res['rev']

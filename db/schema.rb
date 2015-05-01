@@ -15,6 +15,7 @@ ActiveRecord::Schema.define do
 
   execute <<-SQL.strip
     CREATE VIRTUAL TABLE slices USING fts4(
+      id INTEGER AUTO INCREMENT PRIMARY KEY,
       sketch_file_id INTEGER NOT NULL,
       path VARCHAR(256) NOT NULL,
       layer VARCHAR(256) NOT NULL,
