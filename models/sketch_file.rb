@@ -1,3 +1,5 @@
+require 'mixlib/shellout'
+
 class SketchFile < ActiveRecord::Base
   has_many :slices, dependent: :destroy
   scope :in_sync, -> { where(in_sync: true) }
@@ -54,8 +56,7 @@ class SketchFile < ActiveRecord::Base
       sfile_directory = sfile.dropbox_path.gsub(/\.sketch$/, '').scan(/\w+/).join('-')
       FileUtils.mkdir_p(File.join('images', sfile_directory))
 
-      $logger.info 'fetching ' + sfile.dropbox_path
-      $logger.info '  into ' + sfile_directory
+      $logger.info "[#{id}] fetching #{sfile.dropbox_path} into #{sfile_directory}"
 
       Dir.mktmpdir do |tmp|
         metadata = {}
@@ -68,7 +69,25 @@ class SketchFile < ActiveRecord::Base
         end
 
         sketchtool_path = File.expand_path('../../vendor/sketchtool', __FILE__)
-        `cd #{tmp} && #{sketchtool_path}/bin/sketchtool export slices download.sketch`
+        command_env = { cwd: tmp, timeout: 120 }
+
+        $logger.info "[#{id}] attempting to determine number of slices..."
+        slice_info = Mixlib::ShellOut.new("#{sketchtool_path}/bin/sketchtool list slices download.sketch", command_env)
+        slice_info = JSON.parse(slice_info.tap(&:run_command).stdout)
+        num_slices = slice_info['pages'].inject(0) do |sum, page|
+          sum += page['slices'].length
+        end
+
+        $logger.info "[#{id}] ...found #{num_slices} slices"
+        if num_slices > 0
+          $logger.info "[#{id}] exporting #{num_slices} slices"
+          export = Mixlib::ShellOut.new("#{sketchtool_path}/bin/sketchtool export slices download.sketch", command_env)
+          export.run_command
+        else
+          $logger.info "[#{id}] no slices, so exporting the artboard instead"
+          export = Mixlib::ShellOut.new("#{sketchtool_path}/bin/sketchtool export artboards download.sketch", command_env)
+          export.run_command
+        end
 
         sfile.transaction do
           sfile.slices.delete_all
@@ -98,8 +117,8 @@ class SketchFile < ActiveRecord::Base
         end
       end
     rescue => ex
-      $logger.error "Syncing image #{sfile.dropbox_path}: #{ex.message}. Retrying..."
-      retry
+      $logger.error "[#{id}] Error while syncing image #{sfile.dropbox_path}: #{ex.message}."
+      Threaded.enqueue(SyncWorker, id)
     end
   end
 end

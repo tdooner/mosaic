@@ -25,6 +25,7 @@ GEM
     i18n (0.7.0)
     json (1.8.2)
     minitest (5.5.1)
+    mixlib-shellout (2.0.1)
     multi_json (1.11.0)
     rack (1.6.0)
     rack-protection (1.5.3)
@@ -57,6 +58,7 @@ DEPENDENCIES
   dotenv
   dropbox-sdk
   haml
+  mixlib-shellout
   sinatra
   sinatra-contrib
   sqlite3
