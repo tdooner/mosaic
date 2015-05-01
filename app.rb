@@ -6,6 +6,7 @@ require 'threaded'
 
 require_relative 'lib/db_connection'
 require_relative 'lib/sketch_sync_dropbox'
+require_relative 'lib/setup_sherpa'
 require_relative 'models/slice'
 require_relative 'models/tagging'
 require_relative 'models/sketch_file'
@@ -19,6 +20,7 @@ configure do
   ActiveRecord::Base.logger = $logger
   SketchSyncDropbox.authenticate!(ENV['DROPBOX_APP_KEY'], ENV['DROPBOX_APP_SECRET'])
   SketchSyncDB.create_schema unless SketchSyncDB.schema_exists?
+  SetupSherpa.guide_the_user_along_the_dark_mac_os_path!
 
   Tagging.initialize_all!
 
