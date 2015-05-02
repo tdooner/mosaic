@@ -1,156 +1,223 @@
-// This thing checks for the status
-var updateStatus = function() {
-  $.getJSON('/status', {}, function(data, textStatus, xhr) {
-    $("#status").html("<b>" + data.in_sync + "</b> / " + data.files + " sketch files in sync");
-    if (data.in_sync != data.files) {
-      window.setTimeout(updateStatus, 2000);
-    }
-  });
-}
+var Router = ReactRouter,
+    Route = Router.Route,
+    DefaultRoute = Router.DefaultRoute,
+    RouteHandler = Router.RouteHandler;
 
-var clearSearchResults = function() {
-  if ($("#search").val().length == 0) {
-    $("#no-results").show();
-    $("#results").html('');
-    return true;
-  }
+var Header = React.createClass({
+  mixins: [Router.Navigation],
 
-  return false;
-}
+  search: function(e) {
+    this.transitionTo('/' + e.target.value);
+  },
 
-var search = function(query) {
-  if (clearSearchResults()) {
-    return;
-  }
-  $(window).scrollTop(0);
-  $.post('/search', {
-    query: query
-  }, function(data, status, xhr) {
-    $("#no-results").hide();
-    $("#results").html('');
-
-    if (clearSearchResults()) {
-      return;
-    }
-
-    var slicesShown = 0;
-
-    for (var i in data.results) {
-      var result = data.results[i];
-      result.basename = result.file.split('/').pop();
-      result_info = []
-      result_info.push("<span><i class='fa fa-clock-o'></i> " + new Date(result.last_modified).toRelativeTime() + "</span>");
-      if (result.tags.length > 0) {
-        result_info.push("<span>" + result.tags.join(', ') + "</span>");
-      }
-      result_info.push("<span><a target='_new' href='/download/" + result.file_id + "'>Download from Dropbox</a></span>");
-
-      $("#results").append(
-        "<div class='result-file row'>" +
-          "<div class='result-filename-container'>" +
-            "<h2 class='result-filename'><i class='fa fa-file-image-o'></i> " + result.basename + "</h2>" +
-            result_info.join(" &middot; ") +
-          "</div>" + result.slices.map(function(slice) {
-        var thumb_url = slice.path.replace('.png', '.thumb.jpg'),
-            image_attr = (slicesShown < 6) ? "src='" + thumb_url + "'" : "data-original='" + thumb_url + "'";
-        slicesShown += 1;
-
-        return "<div class='result-slice col-xs-4'><a href='" + slice.path + "' target='_new'><h3 class='result-slice-layer-title'>" + slice.layer + "</h3><img " + image_attr + " /></a></div>";
-      }).join(' ') + "</div>");
-    }
-    resetScrollListeners();
-  });
-};
-
-// this is necessary to prevent the page from coming to a scrolling crawl:
-var resetScrollListeners = function() {
-  $(window).off('scroll');
-  $("#results img").lazyload();
-  $(window).on('scroll', handleScroll);
-
-}
-
-var handleScroll = function(e) {
-  var $container = $("#search-container");
-
-  if (window.scrollY < 60 && $container.hasClass('search-mode')) {
-    return;
-  }
-
-  var invisibleLine = window.scrollY + 60;
-  // find the last .result-file above the invisible line
-  var lastAboveLine;
-  $('.result-file').each(function(i) {
-    if ($(this).offset().top < invisibleLine) {
-      lastAboveLine = $(this);
-    }
-  });
-
-  if (lastAboveLine) {
-    $container.removeClass('search-mode');
-    $container.addClass('filename-mode');
-    $container.find('.search-icon').removeClass('fa-search').addClass('fa-chevron-left');
-    $container.find('.search-or-filename #search').hide();
-    $container.find('.search-or-filename #filename').html(
-      lastAboveLine.find('.result-filename').html()
+  render: function() {
+    return (
+      <div key={1} className="sticky-header search-mode" id="search-container">
+        <div className="container">
+          <div className="row">
+            <i className="fa fa-search search-icon" />
+            <span className="search-or-filename">
+              <input onChange={this.search} id="search" autocomplete="off" />
+              <span id="filename" />
+            </span>
+          </div>
+        </div>
+      </div>
     );
-    $container.find('.search-or-filename #filename').show();
-  } else {
-    $container.removeClass('filename-mode');
-    $container.addClass('search-mode');
-    $container.find('.search-icon').removeClass('fa-chevron-left').addClass('fa-search');
-    $container.find('.search-or-filename #search').show();
-    $container.find('.search-or-filename #filename').hide();
   }
-};
+});
 
-var setTagClickHandlers = function() {
-  var tagClickHandler = function(e) {
-    $.post('/tags', {
-        tag: $(e.target).data('tag'),
-        path: $(e.target).closest('.list-group-item').data('path')
-      }, function(data, success, xhr) {
-        $(e.target).closest('.list-group-item').find('.tag-button').each(function(button) {
-          var tag = $(this).data('tag');
-          var anyFound = false;
+var Homepage = React.createClass({
+  render: function() {
+    return (
+      <div className="row" id="no-results">
+        <div className="col-xs-12">
+          <h2>Welcome to Mosaic</h2>
+          <span style={{fontSize: '96px'}}>
+            <i className="fa fa-diamond" style={{color: '#ecb22f'}} />
+            <i className="fa fa-arrow-right" style={{opacity: '0.2'}} />
+            <i className="fa fa-dropbox" style={{color: '#3277e3'}} />
+            <i className="fa fa-arrow-right" style={{opacity: '0.2'}} />
+            <i className="fa fa-thumbs-o-up" style={{color: '#009900'}} />
+          </span>
 
-          for (var i in data) {
-            if (data[i].type === tag) {
-              anyFound = true;
-            }
-          }
+          <h3>How it works:</h3>
+          <p>
+            Every <b>.sketch</b> file in the Design dropbox is being watched.
+            When an update happens, this app will fetch the new version and
+            export all the slices into separate PNGs.
+          </p>
+          <p>
+            All PNGs are searchable by name, with the link back to the original
+            design file in Dropbox.
+          </p>
 
-          $(this).toggleClass('btn-success', anyFound);
-        })
-    });
-  };
+          <h3>Try some search queries:</h3>
+          <ul>
+            <li>"partner tools"</li>
+            <li>"ribbon"</li>
+            <li>"profile android"</li>
+            <li>"support button"</li>
+            <li>"delight card"</li>
+          </ul>
+        </div>
+      </div>
+    );
+  }
+});
 
-  $(function() {
-    $('.tag-button').on('click', tagClickHandler);
-  });
-}
+var Status = React.createClass({
+  getInitialState: function() {
+    return { inSync: undefined, totalSlices: undefined };
+  },
 
-$(function() {
-  updateStatus();
-  setTagClickHandlers();
+  componentWillMount: function() {
+    this.updateCounter();
+  },
 
-  // It's all about search of course!
-  $("#search-container").on('click', function(e) {
-    if ($('#search-container').hasClass('search-mode')) {
-      $("#search").focus(); // fake it till you make it!
-    } else {
-      $(window).scrollTop(0);
-      setTimeout(function() {
-        $("#search").focus(); // fake it till you make it!
-      }, 100);
+  componentWillUnmount: function() {
+    if (this.updateJob) {
+      window.clearTimeout(this.updateJob);
     }
-  });
-  $("#search").focus();
+  },
 
-  if ($("#search").val().length > 0) {
-    search($("#search").val());
+  updateCounter: function() {
+    $.getJSON('/status', {}, function(data, textStatus, xhr) {
+      this.setState({ inSync: data.in_sync, totalSlices: data.files });
+
+      if (data.in_sync != data.files) {
+        this.updateJob = window.setTimeout(this.updateCounter, 2000);
+      }
+    }.bind(this));
+  },
+
+  render: function() {
+    return (
+      <div className="row">
+        <div className="col-xs-12">
+          <p id="status-container">
+            Status:
+            <span id="status">
+              <b>{this.state.inSync}</b> / <b>{this.state.totalSlices}</b>
+            </span>
+          </p>
+        </div>
+      </div>
+    );
   }
-  $('#search').on('keyup', function(e) {
-    search(e.target.value);
-  });
+});
+
+var App = React.createClass({
+  render: function() {
+    return (
+      <div>
+        <Header />
+        <div id="search-container-spacer" />
+        <div className="container">
+          <RouteHandler />
+          <Status />
+        </div>
+      </div>
+    );
+  }
+});
+
+var Search = React.createClass({
+  contextTypes: {
+    router: React.PropTypes.func
+  },
+
+  getInitialState: function() {
+    return { query: this.context.router.getCurrentParams().query, results: [] };
+  },
+
+  componentWillReceiveProps: function() {
+    var query = this.context.router.getCurrentParams().query;
+    this.setState({ query: query });
+
+    $.post('/search', {
+      query: query
+    }, function(data, status, xhr) {
+      this.setState({ results: data.results });
+    }.bind(this));
+  },
+
+  render: function() {
+    return (
+      <div>
+        {this.state.results.map(function(result, i) {
+          return <SearchResultFile result={result} key={i} />;
+        })}
+      </div>
+    );
+  }
+});
+
+var SearchResultSlice = React.createClass({
+  getInitialState: function() {
+    return { showImages: false };
+  },
+
+  showImages: function() {
+    this.setState({ showImages: true });
+  },
+
+  render: function() {
+    var slice = this.props.slice;
+    var thumb_url = slice.path.replace('.png', '.thumb.jpg'),
+        image_attr = this.state.showImages ? { "src" : thumb_url } : { "data-original": thumb_url };
+
+    return (
+      <div className="result-slice col-xs-4">
+        <Waypoint onEnter={this.showImages} threshold={0.2} />
+        <a href={slice.path} target='_new'>
+          <h3 className='result-slice-layer-title'>{slice.layer}</h3>
+          {React.DOM.img(image_attr)}
+        </a>
+      </div>
+    );
+  }
+});
+
+var SearchResultFile = React.createClass({
+  render: function() {
+    var result = this.props.result;
+
+    result.basename = result.file.split('/').pop();
+    result_info = [];
+    result_info.push(
+      <span>
+        <i className="fa fa-clock-o" />
+        {new Date(result.last_modified).toRelativeTime()}
+      </span>
+    );
+    if (result.tags.length > 0) {
+      result_info.push(<span>{result.tags.join(',')}</span>);
+    }
+    result_info.push(<span><a target='_new' href={'/download/' + result.file_id}>Download from Dropbox</a></span>);
+
+    return (
+      <div className="result-file row">
+        <div className="result-filename-container">
+          <h2 className="result-filename"><i className="fa fa-file-image-o" />{result.basename}</h2>
+          {result_info.join(' &middot; ')}
+        </div>
+        {result.slices.map(function(slice) {
+          return <SearchResultSlice slice={slice} />
+        })}
+      </div>
+    );
+  }
+});
+
+var routes = (
+  <Route name="app" path="/" handler={App}>
+    <Route name="search" path=":query" handler={Search} />
+
+    <DefaultRoute handler={Homepage} />
+  </Route>
+);
+
+Router.run(routes, function(Handler) {
+  React.render(<Handler />, document.body);
 });
