@@ -1,4 +1,4 @@
-require 'active_record'
+require 'active_record'; ActiveRecord::Base.raise_in_transactional_callbacks = true
 require 'haml'
 require 'sinatra'
 require 'sinatra/json'
@@ -18,9 +18,9 @@ set :public_folder, '.'
 
 configure do
   ActiveRecord::Base.logger = $logger
+  SetupSherpa.guide!
   SketchSyncDropbox.authenticate!(ENV['DROPBOX_APP_KEY'], ENV['DROPBOX_APP_SECRET'])
   SketchSyncDB.create_schema unless SketchSyncDB.schema_exists?
-  SetupSherpa.guide_the_user_along_the_dark_mac_os_path!
 
   Tagging.initialize_all!
 
