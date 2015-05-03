@@ -101,8 +101,9 @@ var Status = React.createClass({
         <div className="col-xs-12">
           <p id="status-container">
             Status:
+            {' '}
             <span id="status">
-              <b>{this.state.inSync}</b> / <b>{this.state.totalSlices}</b>
+              <b>{this.state.inSync}</b> files in sync (of <b>{this.state.totalSlices}</b>)
             </span>
           </p>
         </div>
@@ -203,7 +204,7 @@ var SearchResultFile = React.createClass({
     return (
       <div className="result-file row">
         <div className="result-filename-container">
-          <h2 className="result-filename"><i className="fa fa-file-image-o" />{result.basename}</h2>
+          <h2 className="result-filename"><i className="fa fa-file-image-o" /> {result.basename}</h2>
           {result_info.join(' &middot; ')}
         </div>
         {result.slices.map(function(slice) {
