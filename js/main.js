@@ -35,9 +35,13 @@ var Homepage = React.createClass({
           <h2>Welcome to Mosaic</h2>
           <span style={{fontSize: '96px'}}>
             <i className="fa fa-diamond" style={{color: '#ecb22f'}} />
+            {' '}
             <i className="fa fa-arrow-right" style={{opacity: '0.2'}} />
+            {' '}
             <i className="fa fa-dropbox" style={{color: '#3277e3'}} />
+            {' '}
             <i className="fa fa-arrow-right" style={{opacity: '0.2'}} />
+            {' '}
             <i className="fa fa-thumbs-o-up" style={{color: '#009900'}} />
           </span>
 
