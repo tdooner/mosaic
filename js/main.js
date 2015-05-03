@@ -193,7 +193,8 @@ var SearchResultFile = React.createClass({
     result_info.push(
       <span>
         <i className="fa fa-clock-o" />
-        {new Date(result.last_modified).toRelativeTime()}
+        {' ' + new Date(result.last_modified).toRelativeTime()}
+        {' \u00b7 '}
       </span>
     );
     if (result.tags.length > 0) {
@@ -205,7 +206,7 @@ var SearchResultFile = React.createClass({
       <div className="result-file row">
         <div className="result-filename-container">
           <h2 className="result-filename"><i className="fa fa-file-image-o" /> {result.basename}</h2>
-          {result_info.join(' &middot; ')}
+          {result_info}
         </div>
         {result.slices.map(function(slice) {
           return <SearchResultSlice slice={slice} />
