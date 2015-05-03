@@ -19,8 +19,10 @@ var Header = React.createClass({
   },
 
   updateSearch: function(e) {
-    this.setState({ query: e.target.value });
-    this.transitionTo('/' + e.target.value);
+    this.setState({ query: React.findDOMNode(this.refs.mainSearchInput).value });
+    setTimeout(function() {
+      this.transitionTo('/' + React.findDOMNode(this.refs.mainSearchInput).value);
+    }.bind(this), 1);
   },
 
   render: function() {
