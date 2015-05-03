@@ -29,7 +29,7 @@ configure do
   Threaded.size = 3
   Threaded.start
 
-  SketchFile.sync_all
+  SketchFile.sync_all unless ENV['SKIP_SYNC']
 end
 
 get '/' do
