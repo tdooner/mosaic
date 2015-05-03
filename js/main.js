@@ -6,7 +6,20 @@ var Router = ReactRouter,
 var Header = React.createClass({
   mixins: [Router.Navigation],
 
-  search: function(e) {
+  getDefaultProps: function() {
+    return { initialQuery: '' };
+  },
+
+  getInitialState: function() {
+    return { query: this.props.initialQuery };
+  },
+
+  componentDidMount: function() {
+    React.findDOMNode(this.refs.mainSearchInput).focus();
+  },
+
+  updateSearch: function(e) {
+    this.setState({ query: e.target.value });
     this.transitionTo('/' + e.target.value);
   },
 
@@ -17,7 +30,12 @@ var Header = React.createClass({
           <div className="row">
             <i className="fa fa-search search-icon" />
             <span className="search-or-filename">
-              <input onChange={this.search} id="search" autocomplete="off" />
+              <input
+                ref="mainSearchInput"
+                value={this.state.query}
+                onChange={this.updateSearch}
+                id="search"
+                autoComplete="off" />
               <span id="filename" />
             </span>
           </div>
@@ -113,10 +131,18 @@ var Status = React.createClass({
 });
 
 var App = React.createClass({
+  contextTypes: {
+    router: React.PropTypes.func
+  },
+
+  getInitialState: function() {
+    return { initialQuery: this.context.router.getCurrentParams().query };
+  },
+
   render: function() {
     return (
       <div>
-        <Header />
+        <Header initialQuery={this.state.initialQuery} />
         <div id="search-container-spacer" />
         <div className="container">
           <RouteHandler />
@@ -136,9 +162,18 @@ var Search = React.createClass({
     return { query: this.context.router.getCurrentParams().query, results: [] };
   },
 
+  componentWillMount: function() {
+    this.performSearch();
+  },
+
   componentWillReceiveProps: function() {
     var query = this.context.router.getCurrentParams().query;
     this.setState({ query: query });
+    this.performSearch();
+  },
+
+  performSearch: function() {
+    var query = this.context.router.getCurrentParams().query;
 
     $.post('/search', {
       query: query
