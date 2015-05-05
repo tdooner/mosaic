@@ -1,5 +1,6 @@
 var React = require('react'),
-    SearchResultSlice = require('../components/search_result_slice.jsx');
+    SearchResultSlice = require('../components/search_result_slice.jsx'),
+    moment = require('moment');
 
 var SearchResultFile = React.createClass({
   render: function() {
@@ -10,7 +11,7 @@ var SearchResultFile = React.createClass({
     result_info.push(
       <span>
         <i className="fa fa-clock-o" />
-        {' ' + new Date(result.last_modified).toRelativeTime()}
+        {' ' + moment(result.last_modified).fromNow()}
         {' \u00b7 '}
       </span>
     );
