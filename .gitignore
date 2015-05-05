@@ -1,4 +1,1 @@
-images/*
-vendor/*
-db/development.sqlite3
-.dropbox-credentials
+build/*
