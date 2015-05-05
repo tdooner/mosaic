@@ -1,5 +1,5 @@
 var React = require('react'),
-SearchResultSlice = require('../components/search_result_slice.jsx');
+    SearchResultSlice = require('../components/search_result_slice.jsx');
 
 var SearchResultFile = React.createClass({
   render: function() {
@@ -26,11 +26,11 @@ var SearchResultFile = React.createClass({
           {result_info}
         </div>
         {result.slices.map(function(slice) {
-          return <SearchResultSlice slice={slice} />
+          return (<SearchResultSlice slice={slice} />);
         })}
       </div>
     );
   }
 });
 
-module.exports = SearchResultSlice;
+module.exports = SearchResultFile;
