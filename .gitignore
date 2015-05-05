@@ -1,1 +1,6 @@
 build/*
+images/*
+vendor/*
+db/development.sqlite3
+.dropbox-credentials
+node_modules
