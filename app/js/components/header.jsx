@@ -1,6 +1,21 @@
 var React = require('react'),
     Router = require('react-router');
 
+var debounce = function(func, wait, immediate) {
+  var timeout;
+  return function() {
+    var context = this, args = arguments;
+    var later = function() {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+    var callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
+};
+
 var Header = React.createClass({
   mixins: [Router.Navigation],
 
@@ -16,11 +31,13 @@ var Header = React.createClass({
     React.findDOMNode(this.refs.mainSearchInput).focus();
   },
 
-  updateSearch: function(e) {
+  updateFragment: debounce(function() {
+    this.transitionTo('/' + React.findDOMNode(this.refs.mainSearchInput).value);
+  }, 100),
+
+  updateSearch: function() {
     this.setState({ query: React.findDOMNode(this.refs.mainSearchInput).value });
-    setTimeout(function() {
-      this.transitionTo('/' + React.findDOMNode(this.refs.mainSearchInput).value);
-    }.bind(this), 1);
+    this.updateFragment();
   },
 
   render: function() {

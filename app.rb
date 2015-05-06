@@ -87,7 +87,7 @@ post '/search' do
   recent_results = ranker.call(recent_results)
 
   json({
-    search: [params[:query]],
+    search: params[:query],
     results: (recent_results + results).first(300).group_by(&:sketch_file_id).map do |file_id, slices|
       file = files[file_id].first
 

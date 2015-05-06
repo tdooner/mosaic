@@ -23,16 +23,23 @@ var Search = React.createClass({
     this.performSearch();
   },
 
+  shouldComponentUpdate: function(nextProps, nextState) {
+    return nextState.resultsForQuery === this.context.router.getCurrentParams().query;
+  },
+
   performSearch: function() {
     var query = this.context.router.getCurrentParams().query;
     var body = new FormData();
     body.append("query", query);
 
     fetch('/search', { method: 'POST', body: body })
-    .then(function(resp) { return resp.json() })
-    .then(function(data) {
-      this.setState({ results: data.results });
-    }.bind(this));
+      .then(function(resp) { return resp.json() })
+      .then(function(data) {
+        this.setState({
+          results: data.results,
+          resultsForQuery: data.search
+        });
+      }.bind(this));
   },
 
   render: function() {
