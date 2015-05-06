@@ -15,6 +15,7 @@ $logger = Logger.new(STDOUT)
 
 # TODO: Fix this to only be images/
 set :public_folder, '.'
+set :protection, except: [:json_csrf]
 
 configure do
   ActiveRecord::Base.logger = $logger
