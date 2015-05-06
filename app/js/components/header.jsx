@@ -1,4 +1,5 @@
-var React = require('react'),
+var Mousetrap = require('mousetrap'),
+    React = require('react'),
     Router = require('react-router');
 
 var debounce = function(func, wait, immediate) {
@@ -28,6 +29,15 @@ var Header = React.createClass({
   },
 
   componentDidMount: function() {
+    this.focusSearch();
+    Mousetrap.bind('/', this.focusSearch);
+  },
+
+  componentWillUnmount: function() {
+    Mousetrap.unbind('/', this.focusSearch);
+  },
+
+  focusSearch: function() {
     React.findDOMNode(this.refs.mainSearchInput).focus();
   },
 
