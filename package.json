@@ -8,6 +8,7 @@
     "react": "^0.13.2",
     "react-router": "^0.13.3",
     "react-waypoint": "^1.0.1",
-    "webpack": "^1.8.11"
+    "webpack": "^1.8.11",
+    "whatwg-fetch": "^0.8.1"
   }
 }

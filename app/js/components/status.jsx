@@ -1,5 +1,6 @@
-var React = require('react'),
-    $ = require('jquery');
+var React = require('react');
+
+require('../../../node_modules/whatwg-fetch/fetch.js');
 
 var Status = React.createClass({
   getInitialState: function() {
@@ -17,7 +18,9 @@ var Status = React.createClass({
   },
 
   updateCounter: function() {
-    $.getJSON('/status', {}, function(data, textStatus, xhr) {
+    fetch('/status').then(function(resp) {
+      return resp.json();
+    }).then(function(data) {
       this.setState({ inSync: data.in_sync, totalSlices: data.files });
 
       if (data.in_sync != data.files) {

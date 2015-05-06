@@ -1,7 +1,8 @@
 var React = require('react'),
     Router = require('react-router'),
-    SearchResultFile = require('../components/search_result_file.jsx'),
-    $ = require('jquery');
+    SearchResultFile = require('../components/search_result_file.jsx');
+
+require('../../../node_modules/whatwg-fetch/fetch.js');
 
 var Search = React.createClass({
   contextTypes: {
@@ -24,10 +25,12 @@ var Search = React.createClass({
 
   performSearch: function() {
     var query = this.context.router.getCurrentParams().query;
+    var body = new FormData();
+    body.append("query", query);
 
-    $.post('/search', {
-      query: query
-    }, function(data, status, xhr) {
+    fetch('/search', { method: 'POST', body: body })
+    .then(function(resp) { return resp.json() })
+    .then(function(data) {
       this.setState({ results: data.results });
     }.bind(this));
   },
