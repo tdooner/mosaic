@@ -18,7 +18,7 @@ var SearchResultFile = React.createClass({
     if (result.tags.length > 0) {
       result_info.push(<span>{result.tags.join(',')}</span>);
     }
-    result_info.push(<span><a target='_new' href={'/download/' + result.file_id}>Download from Dropbox</a></span>);
+    result_info.push(<span> <a target='_new' href={'/download/' + result.file_id}>Download from Dropbox</a></span>);
 
     return (
       <div className="result-file row">
