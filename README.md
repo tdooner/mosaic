@@ -13,7 +13,7 @@ cd mosaic
 npm install
 webpack app/components -p
 wget http://sketchtool.bohemiancoding.com/sketchtool-latest.zip
-unzip sketchtool-latest.zip -d vendor
+unzip sketchtool-latest.zip -d vendor && rm sketchtool-latest.zip
 bundle install
 
 bundle exec ruby app.rb
