@@ -38,21 +38,21 @@ configure do
 end
 
 get '/' do
-  haml :index, layout: nil
+  haml :index
 end
 
-get '/pages/:id/slice/:coords' do
-  x, y = params[:coords].split(',').map(&:to_f)
-
-  file = SketchPage.find(params[:id]).sketch_artboards.detect do |slice|
-    left, top, right, bottom = slice.bounds.split(',').map(&:to_f)
-
-    left < x && x < right && top < y && y < bottom
-  end
-
-  return json({ slice: nil }) unless file
-  json({ slice: file.name })
-end
+# get '/pages/:id/slice/:coords' do
+#   x, y = params[:coords].split(',').map(&:to_f)
+# 
+#   file = SketchPage.find(params[:id]).sketch_artboards.detect do |slice|
+#     left, top, right, bottom = slice.bounds.split(',').map(&:to_f)
+# 
+#     left < x && x < right && top < y && y < bottom
+#   end
+# 
+#   return json({ slice: nil }) unless file
+#   json({ slice: file.name })
+# end
 
 get '/tags' do
   known_paths = SketchFile.all.pluck(:dropbox_path)
@@ -115,6 +115,8 @@ post '/search' do
 end
 
 get '/status' do
+  # TODO: remove
+  return json({ files: 1, in_sync: 1 })
   json({
     files: SketchFile.count,
     in_sync: SketchFile.in_sync.count

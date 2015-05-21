@@ -7,6 +7,7 @@ const Header = require('header');
 const Status = require('status');
 const Search = require('pages/search');
 const Homepage = require('pages/homepage');
+const SketchPagePage = require('pages/sketch_page');
 
 require('./index.css');
 require('babel-core/polyfill');
@@ -36,6 +37,7 @@ const App = React.createClass({
 const routes = (
   <Route name="app" path="/" handler={App}>
     <Route name="search" path=":query" handler={Search} />
+    <Route name="sketchPage" path="page/:id" handler={SketchPagePage} />
 
     <DefaultRoute handler={Homepage} />
   </Route>

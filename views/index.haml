@@ -1,43 +1,26 @@
-- p = SketchPage.first
+-#
+  - p = SketchPage.first
 
-#coords{ style: 'position: fixed' }
-  coords
+  #coords{ style: 'position: fixed' }
+    coords
 
-%img#page{ data: { bounds: p.bounds }, src: 'ftuflow/pages/' + p.name + '.png', width: '100%' }
-#slice
+  %img#page{ data: { bounds: p.bounds }, src: 'ftuflow/pages/' + p.name + '.png', width: '100%' }
+  #slice
 
-%script{ src: 'http://code.jquery.com/jquery-2.1.4.min.js' }
-:javascript
-  var getSketchPos = function(e) {
-    // bounds:  0     1     2       3
-    //         left, top, right, bottom
-    var bounds = $("#page").data('bounds').split(',').map(parseFloat);
+  %script{ src: 'http://code.jquery.com/jquery-2.1.4.min.js' }
+  :javascript
+    var getSketchPos = function(e) {
+    }
 
-    var clickX = (e.clientX + window.scrollX);
-    var clickY = (e.clientY + window.scrollY);
-
-    var pos = $("#page").offset(),
-      width = $("#page").width(),
-      height = $("#page").height();
-
-    var heightFactor = (bounds[3] - bounds[1]) / height,
-        widthFactor = (bounds[2] - bounds[0]) / width;
-
-    return {
-      "left": bounds[0] + (clickX - pos.left) * widthFactor,
-      "top": bounds[1] + (clickY - pos.top) * heightFactor
-    };
-  }
-
-  $("#page").on('mousemove', function(e) {
-    var coords = getSketchPos(e);
-    $("#coords").html(coords['left'] + ',' + coords['top']);
-  });
-
-  $("#page").on('click', function(e) {
-    var coords = getSketchPos(e);
-    $.getJSON('/pages/1/slice/' + coords['left'] + ',' + coords['top']).done(function(data) {
-      $("#slice").html("<img src='ftuflow/slices/" + data.slice + ".png' />");
-      console.log(data.slice);
+    $("#page").on('mousemove', function(e) {
+      var coords = getSketchPos(e);
+      $("#coords").html(coords['left'] + ',' + coords['top']);
     });
-  });
+
+    $("#page").on('click', function(e) {
+      var coords = getSketchPos(e);
+      $.getJSON('/pages/1/slice/' + coords['left'] + ',' + coords['top']).done(function(data) {
+        $("#slice").html("<img src='ftuflow/slices/" + data.slice + ".png' />");
+        console.log(data.slice);
+      });
+    });
