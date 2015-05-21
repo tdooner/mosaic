@@ -9,22 +9,23 @@ ActiveRecord::Schema.define do
   end
 
   create_table :sketch_pages do |t|
+    t.references :sketch_file
+    t.string :uuid
     t.string :bounds
     t.string :name
+
+    t.index :uuid, unique: true
+    t.index :sketch_file_id
   end
 
   create_table :sketch_artboards do |t|
     t.references :sketch_page
+    t.string :uuid
     t.string :bounds
     t.string :name
 
     t.index :sketch_page_id
-  end
-
-  create_table :taggings do |t|
-    t.string :type, null: false
-    t.integer :weight, null: false
-    t.string :dropbox_path, null: false
+    t.index :uuid, unique: true
   end
 
   execute <<-SQL.strip

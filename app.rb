@@ -4,16 +4,10 @@ require 'sinatra'
 require 'sinatra/json'
 require 'threaded'
 
-require_relative 'lib/db_connection'
-require_relative 'lib/sketch_sync_dropbox'
-require_relative 'lib/setup_sherpa'
-require_relative 'app/models/slice'
-require_relative 'app/models/tagging'
-require_relative 'app/models/mosaic_file'
-require_relative 'app/models/mosaic_files/sketch_page'
-require_relative 'app/models/mosaic_files/sketch_artboard'
+Dir["app/**/*.rb"].each { |f| require_relative f }
 
 $logger = Logger.new(STDOUT)
+$logger.level = Logger::INFO
 
 # TODO: Fix this to only be images/
 set :public_folder, '.'
@@ -22,10 +16,11 @@ set :protection, except: [:json_csrf]
 configure do
   ActiveRecord::Base.logger = $logger
   SetupSherpa.guide!
-  SketchSyncDropbox.authenticate!(ENV['DROPBOX_APP_KEY'], ENV['DROPBOX_APP_SECRET'])
-  SketchSyncDB.create_schema unless SketchSyncDB.schema_exists?
+  DropboxWrapper.authenticate!(ENV['DROPBOX_APP_KEY'], ENV['DROPBOX_APP_SECRET'])
+  MosaicDB.create_schema unless MosaicDB.schema_exists?
 
-  SketchPage.load_from_path(File.expand_path('~/downloads/ftuflow'))
+  # SketchPage.load_from_path(File.expand_path('~/downloads/ftuflow'))
+  DropboxSyncWorker.call
   # Threaded.logger = $logger
   # Threaded.inline = false
   # Threaded.size = 3
