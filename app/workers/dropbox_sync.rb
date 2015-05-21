@@ -7,6 +7,8 @@ class DropboxSyncWorker
         client.search('/design', extension)
       end
 
+      results = results.first(ENV['LIMIT_SYNC'].to_i) if ENV['LIMIT_SYNC']
+
       $logger.info "found #{results.length} *#{extension} files in Dropbox"
       existing = klass.where(dropbox_path: results.map { |r| r['path'].downcase }).pluck(:id)
       dead = klass.where.not(id: existing)
@@ -18,7 +20,7 @@ class DropboxSyncWorker
         next if res['is_dir']
         next if res['path'] =~ /conflicted copy/
 
-        sfile = klass.where(dropbox_path: res['path']).first_or_create(dropbox_rev: 'unknown')
+        sfile = klass.where(dropbox_path: res['path'].downcase).first_or_create(dropbox_rev: 'unknown')
 
         if sfile.dropbox_rev == res['rev']
           sfile.update_attribute(:in_sync, true)
@@ -31,5 +33,7 @@ class DropboxSyncWorker
     sleep 60
 
     Threaded.enqueue(self)
+  rescue => ex
+    $logger.error "Dropbox sync process crashed: #{ex} #{ex.backtrace.join "\n"}"
   end
 end

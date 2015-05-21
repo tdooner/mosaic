@@ -7,7 +7,7 @@ require 'threaded'
 Dir["app/**/*.rb"].each { |f| require_relative f }
 
 $logger = Logger.new(STDOUT)
-$logger.level = Logger::INFO
+$logger.level = Logger::INFO unless ENV['DEBUG']
 
 # TODO: Fix this to only be images/
 set :public_folder, '.'
@@ -20,11 +20,12 @@ configure do
   MosaicDB.create_schema unless MosaicDB.schema_exists?
 
   # SketchPage.load_from_path(File.expand_path('~/downloads/ftuflow'))
-  DropboxSyncWorker.call
-  # Threaded.logger = $logger
-  # Threaded.inline = false
-  # Threaded.size = 3
-  # Threaded.start
+  Threaded.logger = $logger
+  Threaded.inline = false
+  Threaded.size = 3
+  Threaded.start
+
+  Threaded.enqueue(DropboxSyncWorker)
 
   # unless ENV['SKIP_SYNC']
   #   SketchFile.sync_all

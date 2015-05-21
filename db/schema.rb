@@ -14,7 +14,7 @@ ActiveRecord::Schema.define do
     t.string :bounds
     t.string :name
 
-    t.index :uuid, unique: true
+    t.index :uuid
     t.index :sketch_file_id
   end
 
@@ -25,7 +25,7 @@ ActiveRecord::Schema.define do
     t.string :name
 
     t.index :sketch_page_id
-    t.index :uuid, unique: true
+    t.index :uuid
   end
 
   execute <<-SQL.strip
@@ -34,8 +34,10 @@ ActiveRecord::Schema.define do
       body TEXT NOT NULL,
       tokenize=simple
     );
-    CREATE VIRTUAL TABLE slices_fts USING fts4(
-      slice_id INTEGER NOT NULL,
+  SQL
+  execute <<-SQL.strip
+    CREATE VIRTUAL TABLE artboards_fts USING fts4(
+      artboard_id INTEGER NOT NULL,
       body TEXT NOT NULL,
       tokenize=simple
     );
