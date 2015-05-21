@@ -1,26 +1,9 @@
 require 'mixlib/shellout'
 
-class SketchFile < ActiveRecord::Base
-  has_many :slices, dependent: :destroy, inverse_of: :sketch_file
-  scope :in_sync, -> { where(in_sync: true) }
-  scope :with_path, ->(path) { where(dropbox_path: path.downcase) }
-  scope :with_paths, ->(paths) { where(dropbox_path: paths.map(&:downcase)) }
+class SketchArtboard < ActiveRecord::Base
+  belongs_to :sketch_file
 
-  before_save :update_tag_cache
-  serialize :tag_cache
-
-  def update_tag_cache(tags = Tagging.all)
-    self.tag_cache = tags.find_all do |tag|
-      dropbox_path.start_with?(tag.dropbox_path)
-    end.map(&:type)
-  end
-
-  def self.sync_all
-    update_all(in_sync: false)
-    Threaded.enqueue(StartSyncManagerThread)
-  end
-
-  private
+private
 
   class StartSyncManagerThread
     def self.call

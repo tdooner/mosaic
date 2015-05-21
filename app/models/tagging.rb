@@ -20,15 +20,4 @@ class Tagging < ActiveRecord::Base
     tags = tags.map { |t| t.to_sym }
     TYPES_TO_WEIGHTS.values_at(*tags).inject(0, :+)
   end
-
-  def self.initialize_all!
-    tags = Tagging.all.to_a
-
-    transaction do
-      SketchFile.find_each do |file|
-        file.update_tag_cache(tags)
-        file.save
-      end
-    end
-  end
 end

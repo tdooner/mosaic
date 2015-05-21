@@ -7,9 +7,11 @@ require 'threaded'
 require_relative 'lib/db_connection'
 require_relative 'lib/sketch_sync_dropbox'
 require_relative 'lib/setup_sherpa'
-require_relative 'models/slice'
-require_relative 'models/tagging'
-require_relative 'models/sketch_file'
+require_relative 'app/models/slice'
+require_relative 'app/models/tagging'
+require_relative 'app/models/mosaic_file'
+require_relative 'app/models/mosaic_files/sketch_page'
+require_relative 'app/models/mosaic_files/sketch_artboard'
 
 $logger = Logger.new(STDOUT)
 
@@ -23,18 +25,33 @@ configure do
   SketchSyncDropbox.authenticate!(ENV['DROPBOX_APP_KEY'], ENV['DROPBOX_APP_SECRET'])
   SketchSyncDB.create_schema unless SketchSyncDB.schema_exists?
 
-  Tagging.initialize_all!
+  SketchPage.load_from_path(File.expand_path('~/downloads/ftuflow'))
+  # Threaded.logger = $logger
+  # Threaded.inline = false
+  # Threaded.size = 3
+  # Threaded.start
 
-  Threaded.logger = $logger
-  Threaded.inline = false
-  Threaded.size = 3
-  Threaded.start
-
-  SketchFile.sync_all unless ENV['SKIP_SYNC']
+  # unless ENV['SKIP_SYNC']
+  #   SketchFile.sync_all
+  #   Threaded.enqueue(SketchFile::StartSyncManagerThread)
+  # end
 end
 
 get '/' do
-  haml :index
+  haml :index, layout: nil
+end
+
+get '/pages/:id/slice/:coords' do
+  x, y = params[:coords].split(',').map(&:to_f)
+
+  file = SketchPage.find(params[:id]).sketch_artboards.detect do |slice|
+    left, top, right, bottom = slice.bounds.split(',').map(&:to_f)
+
+    left < x && x < right && top < y && y < bottom
+  end
+
+  return json({ slice: nil }) unless file
+  json({ slice: file.name })
 end
 
 get '/tags' do

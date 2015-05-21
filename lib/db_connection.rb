@@ -6,7 +6,7 @@ ActiveRecord::Base.connection.tap(&:verify!)
 module SketchSyncDB
 
   def schema_exists?
-    ActiveRecord::Base.connection.tables.include?('sketch_files')
+    ActiveRecord::Base.connection.tables.include?('mosaic_files')
   end
 
   def create_schema
