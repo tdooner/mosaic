@@ -43,7 +43,7 @@ class ProcessSketchWorker
 
       slice_info['pages'].each do |page_config|
         p = SketchPage.new_from_path(page_config, command_env[:cwd])
-
+        p.sketch_file = sfile
         p.sketch_artboards = page_config['artboards'].map do |artboard_config|
           SketchArtboard.new_from_path(artboard_config, command_env[:cwd])
         end

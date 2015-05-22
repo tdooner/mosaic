@@ -1,5 +1,5 @@
 class SketchArtboard < ActiveRecord::Base
-  belongs_to :sketch_file
+  belongs_to :sketch_page
 
   after_create :index
   before_destroy :unindex

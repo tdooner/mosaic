@@ -9,7 +9,7 @@ ActiveRecord::Schema.define do
   end
 
   create_table :sketch_pages do |t|
-    t.references :sketch_file
+    t.references :sketch_file, null: false
     t.string :uuid
     t.string :bounds
     t.string :name
@@ -19,7 +19,7 @@ ActiveRecord::Schema.define do
   end
 
   create_table :sketch_artboards do |t|
-    t.references :sketch_page
+    t.references :sketch_page, null: false
     t.string :uuid
     t.string :bounds
     t.string :name

@@ -2,7 +2,7 @@ require 'dimensions'
 
 class SketchPage < ActiveRecord::Base
   belongs_to :sketch_file
-  has_many :sketch_artboards, dependent: :destroy, inverse_of: :sketch_file
+  has_many :sketch_artboards, dependent: :destroy, inverse_of: :sketch_page
 
   after_create :index
   before_destroy :unindex

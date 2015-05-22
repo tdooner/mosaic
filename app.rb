@@ -85,30 +85,93 @@ post '/tags' do
 end
 
 post '/search' do
-  # TODO: Make this more sane
-  recent_results = Slice.find_by_search(params[:query]).recently_modified
-  results = Slice.find_by_search(params[:query]).not_recently_modified
+  search_tokens = params[:query].split(/[^\w]/)
+  search_tokens.map! { |t| "#{t}*" }
 
-  results_by_file_id = (recent_results + results).group_by(&:sketch_file_id)
-  files = SketchFile.where(id: results_by_file_id.keys.uniq).group_by(&:id)
+  pages = SketchPage.
+            joins('JOIN pages_fts ON pages_fts.page_id = sketch_pages.id').
+            where('pages_fts.body MATCH ?', search_tokens)
+  artboards = SketchArtboard.
+                includes(sketch_page: :sketch_file).
+                joins('JOIN artboards_fts ON artboards_fts.artboard_id = sketch_artboards.id').
+                where('artboards_fts.body MATCH ?', search_tokens)
 
-  ranker = ->(results) do
-    results = Hash[results.group_by { |s| Tagging.rank_adjustment_for(files[s.sketch_file_id].first.tag_cache) }.sort.reverse]
-    results.map { |_score, res| Hash[res.group_by { |s| results_by_file_id[s.sketch_file_id].count }.sort.reverse].values }.flatten
+  pages_by_file = pages.group_by(&:sketch_file_id)
+  artboards_by_page = artboards.group_by(&:sketch_page_id)
+
+  # find the file with the most pages and artboards:
+  # arbitrarily, this rates pages that match 3x heavier than artboards that do.
+  scores_by_file_id = Hash.new(0)
+  scores_by_page_id = Hash.new(0)
+  pages_by_file.each do |file_id, pages|
+    scores_by_file_id[file_id] = 3 * pages.length
+  end
+  artboards_by_page.each do |page_id, artboards|
+    artboards.each do |artboard|
+      file_id = artboard.sketch_page.sketch_file_id
+      scores_by_file_id[file_id] += 1
+      scores_by_page_id[artboard.sketch_page_id] += 1
+    end
   end
 
-  results = ranker.call(results)
-  recent_results = ranker.call(recent_results)
+  files = SketchFile.where(id: scores_by_file_id.keys).includes(:sketch_pages).index_by(&:id)
+
+  results = scores_by_file_id.sort_by(&:last).reverse.first(20).flat_map do |file_id, _score|
+    file = files[file_id]
+    page_results = pages_by_file.fetch(file_id, []).map do |page|
+      {
+        file: file.dropbox_path,
+        file_id: file_id,
+        last_modified: file.last_modified,
+        type: :page,
+        page: page,
+      }
+    end
+    matching_artboards = artboards_by_page.values_at(*file.sketch_pages.map(&:id)).compact.flatten
+    artboard_results = matching_artboards.map do |artboard|
+      {
+        file: file.dropbox_path,
+        file_id: file_id,
+        last_modified: file.last_modified,
+        type: :artboard,
+        artboard: artboard,
+      }
+    end
+
+    page_results + artboard_results
+  end
 
   json({
     search: params[:query],
-    results: (recent_results + results).first(300).group_by(&:sketch_file_id).map do |file_id, slices|
-      file = files[file_id].first
-
-      { file: file.dropbox_path, tags: file.tag_cache, file_id: file.id, last_modified: file.last_modified, slices: slices }
-    end
+    results: results,
   })
 end
+
+# post '/search' do
+#   # TODO: Make this more sane
+#   recent_results = Slice.find_by_search(params[:query]).recently_modified
+#   results = Slice.find_by_search(params[:query]).not_recently_modified
+#
+#   results_by_file_id = (recent_results + results).group_by(&:sketch_file_id)
+#   files = SketchFile.where(id: results_by_file_id.keys.uniq).group_by(&:id)
+#
+#   ranker = ->(results) do
+#     results = Hash[results.group_by { |s| Tagging.rank_adjustment_for(files[s.sketch_file_id].first.tag_cache) }.sort.reverse]
+#     results.map { |_score, res| Hash[res.group_by { |s| results_by_file_id[s.sketch_file_id].count }.sort.reverse].values }.flatten
+#   end
+#
+#   results = ranker.call(results)
+#   recent_results = ranker.call(recent_results)
+#
+#   json({
+#     search: params[:query],
+#     results: (recent_results + results).first(300).group_by(&:sketch_file_id).map do |file_id, slices|
+#       file = files[file_id].first
+#
+#       { file: file.dropbox_path, tags: file.tag_cache, file_id: file.id, last_modified: file.last_modified, slices: slices }
+#     end
+#   })
+# end
 
 get '/status' do
   # TODO: remove
