@@ -1,13 +1,13 @@
-var React = require('react'),
+const React = require('react'),
     SearchResultSlice = require('../components/search_result_slice.jsx'),
     moment = require('moment');
 
-var SearchResultFile = React.createClass({
+const SearchResultFile = React.createClass({
   render: function() {
-    var result = this.props.result;
+    const result = this.props.result;
 
     result.basename = result.file.split('/').pop();
-    var result_info = [];
+    const result_info = [];
     result_info.push(
       <span>
         <i className="fa fa-clock-o" />

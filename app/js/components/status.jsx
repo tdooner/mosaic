@@ -1,8 +1,8 @@
-var React = require('react');
+const React = require('react');
 
 require('../../../node_modules/whatwg-fetch/fetch.js');
 
-var Status = React.createClass({
+const Status = React.createClass({
   getInitialState: function() {
     return { inSync: undefined, totalSlices: undefined };
   },

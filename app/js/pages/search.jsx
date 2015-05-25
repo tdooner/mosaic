@@ -1,10 +1,10 @@
-var React = require('react'),
+const React = require('react'),
     Router = require('react-router'),
     SearchResultFile = require('../components/search_result_file.jsx');
 
 require('../../../node_modules/whatwg-fetch/fetch.js');
 
-var Search = React.createClass({
+const Search = React.createClass({
   contextTypes: {
     router: React.PropTypes.func
   },
@@ -18,7 +18,7 @@ var Search = React.createClass({
   },
 
   componentWillReceiveProps: function() {
-    var query = this.context.router.getCurrentParams().query;
+    const query = this.context.router.getCurrentParams().query;
     this.setState({ query: query });
     this.performSearch();
   },
@@ -28,8 +28,8 @@ var Search = React.createClass({
   },
 
   performSearch: function() {
-    var query = this.context.router.getCurrentParams().query;
-    var body = new FormData();
+    const query = this.context.router.getCurrentParams().query;
+    const body = new FormData();
     body.append("query", query);
 
     fetch('/search', { method: 'POST', body: body })

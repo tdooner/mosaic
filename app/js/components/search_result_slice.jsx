@@ -1,7 +1,7 @@
-var React = require('react'),
+const React = require('react'),
     Waypoint = require('react-waypoint');
 
-var SearchResultSlice = React.createClass({
+const SearchResultSlice = React.createClass({
   getInitialState: function() {
     return { showImages: false };
   },
@@ -11,8 +11,8 @@ var SearchResultSlice = React.createClass({
   },
 
   render: function() {
-    var slice = this.props.slice;
-    var thumb_url = slice.path.replace('.png', '.thumb.jpg'),
+    const slice = this.props.slice;
+    const thumb_url = slice.path.replace('.png', '.thumb.jpg'),
         image_attr = this.state.showImages ? { "src" : thumb_url } : { "data-original": thumb_url };
 
     return (

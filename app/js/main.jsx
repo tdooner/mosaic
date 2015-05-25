@@ -1,4 +1,4 @@
-var React = require('react'),
+const React = require('react'),
     Router = require('react-router'),
     DefaultRoute = Router.DefaultRoute,
     RouteHandler = Router.RouteHandler,
@@ -10,7 +10,7 @@ var React = require('react'),
 
 require('babel-core/polyfill');
 
-var App = React.createClass({
+const App = React.createClass({
   contextTypes: {
     router: React.PropTypes.func
   },
@@ -33,7 +33,7 @@ var App = React.createClass({
   }
 });
 
-var routes = (
+const routes = (
   <Route name="app" path="/" handler={App}>
     <Route name="search" path=":query" handler={Search} />
 

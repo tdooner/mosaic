@@ -1,6 +1,6 @@
-var React = require('react');
+const React = require('react');
 
-var Homepage = React.createClass({
+const Homepage = React.createClass({
   render: function() {
     return (
       <div className="row" id="no-results">

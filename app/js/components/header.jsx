@@ -1,23 +1,23 @@
-var Mousetrap = require('mousetrap'),
+const Mousetrap = require('mousetrap'),
     React = require('react'),
     Router = require('react-router');
 
-var debounce = function(func, wait, immediate) {
-  var timeout;
+const debounce = function(func, wait, immediate) {
+  let timeout;
   return function() {
-    var context = this, args = arguments;
-    var later = function() {
+    const context = this, args = arguments;
+    const later = function() {
       timeout = null;
       if (!immediate) func.apply(context, args);
     };
-    var callNow = immediate && !timeout;
+    const callNow = immediate && !timeout;
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
     if (callNow) func.apply(context, args);
   };
 };
 
-var Header = React.createClass({
+const Header = React.createClass({
   mixins: [Router.Navigation],
 
   getDefaultProps: function() {
