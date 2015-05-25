@@ -11,7 +11,7 @@ const SearchResultFile = React.createClass({
 
     return (
       <div className="result-file row">
-        <div className="result-filename-container">
+        <div>
           <h2 className="result-filename">
             <i className="fa fa-file-image-o" />
             {' '}

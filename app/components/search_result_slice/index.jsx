@@ -20,7 +20,7 @@ const SearchResultSlice = React.createClass({
       <div className="result-slice col-xs-4">
         <Waypoint onEnter={this.showImages} threshold={0.2} />
         <a href={slice.path} target='_new'>
-          <h3 className='result-slice-layer-title'>{slice.layer}</h3>
+          <h3>{slice.layer}</h3>
           {this.state.showImages &&
             <img className='result-slice-image' src={thumb_url} />}
         </a>

@@ -34,10 +34,10 @@ const Status = React.createClass({
     return (
       <div className="row">
         <div className="col-xs-12">
-          <p id="status-container">
+          <p>
             Status:
             {' '}
-            <span id="status">
+            <span>
               <b>{this.state.inSync}</b> files in sync
               (of <b>{this.state.totalSlices}</b>)
             </span>
