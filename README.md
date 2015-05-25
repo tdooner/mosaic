@@ -14,8 +14,9 @@ npm install
 webpack app/js/main.jsx -p
 wget http://sketchtool.bohemiancoding.com/sketchtool-latest.zip
 unzip sketchtool-latest.zip -d vendor
+bundle install
 
-ruby app.rb
+bundle exec ruby app.rb
 ```
 
 You will need to go through some more setup steps once you get the application
