@@ -1,7 +1,7 @@
 const React = require('react');
 
 const Homepage = React.createClass({
-  render: function() {
+  render() {
     return (
       <div className="row" id="no-results">
         <div className="col-xs-12">

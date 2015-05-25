@@ -3,21 +3,21 @@ const React = require('react');
 require('../../../node_modules/whatwg-fetch/fetch.js');
 
 const Status = React.createClass({
-  getInitialState: function() {
+  getInitialState() {
     return { inSync: undefined, totalSlices: undefined };
   },
 
-  componentWillMount: function() {
+  componentWillMount() {
     this.updateCounter();
   },
 
-  componentWillUnmount: function() {
+  componentWillUnmount() {
     if (this.updateJob) {
       window.clearTimeout(this.updateJob);
     }
   },
 
-  updateCounter: function() {
+  updateCounter() {
     fetch('/status').then(function(resp) {
       return resp.json();
     }).then(function(data) {
@@ -29,7 +29,7 @@ const Status = React.createClass({
     }.bind(this));
   },
 
-  render: function() {
+  render() {
     return (
       <div className="row">
         <div className="col-xs-12">

@@ -15,11 +15,11 @@ const App = React.createClass({
     router: React.PropTypes.func
   },
 
-  getInitialState: function() {
+  getInitialState() {
     return { initialQuery: this.context.router.getCurrentParams().query };
   },
 
-  render: function() {
+  render() {
     return (
       <div>
         <Header initialQuery={this.state.initialQuery} />

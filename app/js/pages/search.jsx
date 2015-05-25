@@ -9,25 +9,25 @@ const Search = React.createClass({
     router: React.PropTypes.func
   },
 
-  getInitialState: function() {
+  getInitialState() {
     return { query: this.context.router.getCurrentParams().query, results: [] };
   },
 
-  componentWillMount: function() {
+  componentWillMount() {
     this.performSearch();
   },
 
-  componentWillReceiveProps: function() {
+  componentWillReceiveProps() {
     const query = this.context.router.getCurrentParams().query;
     this.setState({ query: query });
     this.performSearch();
   },
 
-  shouldComponentUpdate: function(nextProps, nextState) {
+  shouldComponentUpdate(nextProps, nextState) {
     return nextState.resultsForQuery === this.context.router.getCurrentParams().query;
   },
 
-  performSearch: function() {
+  performSearch() {
     const query = this.context.router.getCurrentParams().query;
     const body = new FormData();
     body.append("query", query);
@@ -42,7 +42,7 @@ const Search = React.createClass({
       }.bind(this));
   },
 
-  render: function() {
+  render() {
     return (
       <div>
         {this.state.results.map((result, i) =>

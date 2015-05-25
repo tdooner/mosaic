@@ -20,24 +20,24 @@ const debounce = function(func, wait, immediate) {
 const Header = React.createClass({
   mixins: [Router.Navigation],
 
-  getDefaultProps: function() {
+  getDefaultProps() {
     return { initialQuery: '' };
   },
 
-  getInitialState: function() {
+  getInitialState() {
     return { query: this.props.initialQuery };
   },
 
-  componentDidMount: function() {
+  componentDidMount() {
     this.focusSearch();
     Mousetrap.bind('/', this.focusSearch);
   },
 
-  componentWillUnmount: function() {
+  componentWillUnmount() {
     Mousetrap.unbind('/', this.focusSearch);
   },
 
-  focusSearch: function() {
+  focusSearch() {
     React.findDOMNode(this.refs.mainSearchInput).focus();
   },
 
@@ -45,12 +45,12 @@ const Header = React.createClass({
     this.transitionTo('/' + React.findDOMNode(this.refs.mainSearchInput).value);
   }, 100),
 
-  updateSearch: function() {
+  updateSearch() {
     this.setState({ query: React.findDOMNode(this.refs.mainSearchInput).value });
     this.updateFragment();
   },
 
-  render: function() {
+  render() {
     return (
       <div key={1} className="sticky-header search-mode" id="search-container">
         <div className="container">

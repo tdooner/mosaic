@@ -3,7 +3,7 @@ const React = require('react'),
     moment = require('moment');
 
 const SearchResultFile = React.createClass({
-  render: function() {
+  render() {
     const result = this.props.result;
 
     result.basename = result.file.split('/').pop();
