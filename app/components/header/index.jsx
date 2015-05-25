@@ -2,6 +2,8 @@ const Mousetrap = require('mousetrap');
 const React = require('react');
 const Router = require('react-router');
 
+require('./index.css');
+
 const debounce = function(func, wait, immediate) {
   let timeout;
   return function() {

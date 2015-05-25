@@ -1,6 +1,8 @@
 const React = require('react');
 const Waypoint = require('react-waypoint');
 
+require('./index.css');
+
 const SearchResultSlice = React.createClass({
   getInitialState() {
     return { showImages: false };

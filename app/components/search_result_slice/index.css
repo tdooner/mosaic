@@ -1,0 +1,11 @@
+.result-slice {
+  cursor: pointer;
+  height: 400px;
+  text-align: center;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.result-slice-image {
+  max-width: 100%;
+}

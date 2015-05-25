@@ -2,6 +2,8 @@ const React = require('react');
 const SearchResultSlice = require('search_result_slice');
 const moment = require('moment');
 
+require('./index.css');
+
 const SearchResultFile = React.createClass({
   render() {
     const { result } = this.props;
