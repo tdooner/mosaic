@@ -1,3 +1,5 @@
+const autoprefixer = require('autoprefixer-core');
+
 module.exports = {
   output: {
     filename: 'build/application.js'
@@ -11,10 +13,11 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        loader: 'style-loader!css-loader'
+        loader: 'style-loader!css-loader!postcss-loader'
       }
     ]
   },
+  postcss: [autoprefixer],
   resolve: {
     modulesDirectories: [
       'app/components',
