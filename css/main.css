@@ -61,3 +61,7 @@ body, html {
   margin-bottom: 24px;
   overflow: hidden;
 }
+
+.result-slice-image {
+  max-width: 100%;
+}

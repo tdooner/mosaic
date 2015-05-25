@@ -12,15 +12,15 @@ const SearchResultSlice = React.createClass({
 
   render() {
     const slice = this.props.slice;
-    const thumb_url = slice.path.replace('.png', '.thumb.jpg'),
-        image_attr = this.state.showImages ? { "src" : thumb_url } : { "data-original": thumb_url };
+    const thumb_url = slice.path.replace('.png', '.thumb.jpg');
 
     return (
       <div className="result-slice col-xs-4">
         <Waypoint onEnter={this.showImages} threshold={0.2} />
         <a href={slice.path} target='_new'>
           <h3 className='result-slice-layer-title'>{slice.layer}</h3>
-          {React.DOM.img(image_attr)}
+          {this.state.showImages &&
+            <img className='result-slice-image' src={thumb_url} />}
         </a>
       </div>
     );
