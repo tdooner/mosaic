@@ -54,21 +54,19 @@ const Header = React.createClass({
 
   render() {
     return (
-      <div key={1} className="sticky-header search-mode" id="search-container">
-        <div className="container">
-          <div className="row">
-            <i className="fa fa-search search-icon" />
-            <span className="search-or-filename">
-              <input
-                ref="mainSearchInput"
-                value={this.state.query}
-                onChange={this.updateSearch}
-                id="search"
-                autoComplete="off" />
-              <span id="filename" />
-            </span>
-          </div>
-        </div>
+      <div key={1} className="search-container">
+        <label className="search-icon" htmlFor="search-input">
+          <i className="fa fa-search" />
+        </label>
+        <input
+          autoComplete="off"
+          className="search-input"
+          id="search-input"
+          onChange={this.updateSearch}
+          ref="mainSearchInput"
+          type="search"
+          value={this.state.query}
+        />
       </div>
     );
   }
