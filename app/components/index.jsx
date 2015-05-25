@@ -1,14 +1,14 @@
-const React = require('react'),
-    Router = require('react-router'),
-    DefaultRoute = Router.DefaultRoute,
-    RouteHandler = Router.RouteHandler,
-    Route = Router.Route,
-    Header = require('./components/header.jsx'),
-    Status = require('./components/status.jsx'),
-    Search = require('./pages/search.jsx'),
-    Homepage = require('./pages/homepage.jsx');
+const React = require('react');
+const Router = require('react-router');
+const DefaultRoute = Router.DefaultRoute;
+const RouteHandler = Router.RouteHandler;
+const Route = Router.Route;
+const Header = require('header');
+const Status = require('status');
+const Search = require('pages/search');
+const Homepage = require('pages/homepage');
 
-require('./main.css');
+require('./index.css');
 require('babel-core/polyfill');
 
 const App = React.createClass({

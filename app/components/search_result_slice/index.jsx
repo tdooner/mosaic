@@ -1,5 +1,5 @@
-const React = require('react'),
-    Waypoint = require('react-waypoint');
+const React = require('react');
+const Waypoint = require('react-waypoint');
 
 const SearchResultSlice = React.createClass({
   getInitialState() {

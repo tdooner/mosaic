@@ -1,8 +1,8 @@
-const React = require('react'),
-    Router = require('react-router'),
-    SearchResultFile = require('../components/search_result_file.jsx');
+const React = require('react');
+const Router = require('react-router');
+const SearchResultFile = require('search_result_file');
 
-require('../../../node_modules/whatwg-fetch/fetch.js');
+require('whatwg-fetch');
 
 const Search = React.createClass({
   contextTypes: {

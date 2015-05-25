@@ -14,5 +14,12 @@ module.exports = {
         loader: 'style-loader!css-loader'
       }
     ]
+  },
+  resolve: {
+    modulesDirectories: [
+      'app/components',
+      'node_modules'
+    ],
+    extensions: ['', '.js', '.jsx']
   }
 };

@@ -1,6 +1,6 @@
 const React = require('react');
 
-require('../../../node_modules/whatwg-fetch/fetch.js');
+require('whatwg-fetch');
 
 const Status = React.createClass({
   getInitialState() {

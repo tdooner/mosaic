@@ -1,6 +1,6 @@
-const React = require('react'),
-    SearchResultSlice = require('../components/search_result_slice.jsx'),
-    moment = require('moment');
+const React = require('react');
+const SearchResultSlice = require('search_result_slice');
+const moment = require('moment');
 
 const SearchResultFile = React.createClass({
   render() {
