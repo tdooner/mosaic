@@ -54,19 +54,21 @@ const Header = React.createClass({
 
   render() {
     return (
-      <div key={1} className="search-container">
-        <label className="search-icon" htmlFor="search-input">
-          <i className="fa fa-search" />
-        </label>
-        <input
-          autoComplete="off"
-          className="search-input"
-          id="search-input"
-          onChange={this.updateSearch}
-          ref="mainSearchInput"
-          type="search"
-          value={this.state.query}
-        />
+      <div className="header">
+        <div className="search-container">
+          <label className="search-icon" htmlFor="search-input">
+            <i className="fa fa-search" />
+          </label>
+          <input
+            autoComplete="off"
+            className="search-input"
+            id="search-input"
+            onChange={this.updateSearch}
+            ref="mainSearchInput"
+            type="search"
+            value={this.state.query}
+          />
+        </div>
       </div>
     );
   }

@@ -24,7 +24,6 @@ const App = React.createClass({
     return (
       <div>
         <Header initialQuery={this.state.initialQuery} />
-        <div id="search-container-spacer" />
         <div className="container">
           <RouteHandler />
           <Status />
