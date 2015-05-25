@@ -33,13 +33,13 @@ const Search = React.createClass({
     body.append("query", query);
 
     fetch('/search', { method: 'POST', body: body })
-      .then(function(resp) { return resp.json() })
-      .then(function(data) {
+      .then(resp => resp.json())
+      .then((data) => {
         this.setState({
           results: data.results,
           resultsForQuery: data.search
         });
-      }.bind(this));
+      });
   },
 
   render() {
