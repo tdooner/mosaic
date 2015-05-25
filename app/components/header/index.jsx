@@ -1,23 +1,9 @@
 const Mousetrap = require('mousetrap');
 const React = require('react');
 const Router = require('react-router');
+const debounce = require('lodash.debounce');
 
 require('./index.css');
-
-const debounce = function(func, wait, immediate) {
-  let timeout;
-  return function() {
-    const context = this, args = arguments;
-    const later = function() {
-      timeout = null;
-      if (!immediate) func.apply(context, args);
-    };
-    const callNow = immediate && !timeout;
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-    if (callNow) func.apply(context, args);
-  };
-};
 
 const Header = React.createClass({
   mixins: [Router.Navigation],
