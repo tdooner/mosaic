@@ -7,7 +7,7 @@ var SearchResultFile = React.createClass({
     var result = this.props.result;
 
     result.basename = result.file.split('/').pop();
-    result_info = [];
+    var result_info = [];
     result_info.push(
       <span>
         <i className="fa fa-clock-o" />

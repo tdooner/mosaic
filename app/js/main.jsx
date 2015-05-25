@@ -8,6 +8,8 @@ var React = require('react'),
     Search = require('./pages/search.jsx'),
     Homepage = require('./pages/homepage.jsx');
 
+require('babel-core/polyfill');
+
 var App = React.createClass({
   contextTypes: {
     router: React.PropTypes.func
