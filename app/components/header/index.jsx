@@ -31,7 +31,6 @@ const Header = React.createClass({
   },
 
   componentDidMount() {
-    this.focusSearch();
     Mousetrap.bind('/', this.focusSearch);
   },
 
@@ -61,6 +60,7 @@ const Header = React.createClass({
           </label>
           <input
             autoComplete="off"
+            autoFocus
             className="search-input"
             id="search-input"
             onChange={this.updateSearch}
