@@ -45,9 +45,8 @@ const Search = React.createClass({
   render: function() {
     return (
       <div>
-        {this.state.results.map(function(result, i) {
-          return <SearchResultFile result={result} key={i} />;
-        })}
+        {this.state.results.map((result, i) =>
+          <SearchResultFile result={result} key={i} />)}
       </div>
     );
   }
