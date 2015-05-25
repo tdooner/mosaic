@@ -8,6 +8,7 @@ const React = require('react'),
     Search = require('./pages/search.jsx'),
     Homepage = require('./pages/homepage.jsx');
 
+require('./main.css');
 require('babel-core/polyfill');
 
 const App = React.createClass({
