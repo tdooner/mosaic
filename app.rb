@@ -2,9 +2,13 @@ require 'active_record'; ActiveRecord::Base.raise_in_transactional_callbacks = t
 require 'haml'
 require 'sinatra'
 require 'sinatra/json'
+require 'sinatra/reloader' if development?
 require 'threaded'
 
-Dir["app/**/*.rb"].each { |f| require_relative f }
+Dir["app/**/*.rb"].each do |f|
+  require_relative f
+  also_reload(f) if development?
+end
 
 $logger = Logger.new(STDOUT)
 $logger.level = Logger::INFO unless ENV['DEBUG']
@@ -85,16 +89,7 @@ post '/tags' do
 end
 
 post '/search' do
-  search_tokens = params[:query].split(/[^\w]/)
-  search_tokens.map! { |t| "#{t}*" }
-
-  pages = SketchPage.
-            joins('JOIN pages_fts ON pages_fts.page_id = sketch_pages.id').
-            where('pages_fts.body MATCH ?', search_tokens)
-  artboards = SketchArtboard.
-                includes(sketch_page: :sketch_file).
-                joins('JOIN artboards_fts ON artboards_fts.artboard_id = sketch_artboards.id').
-                where('artboards_fts.body MATCH ?', search_tokens)
+  return MosaicSearch.new(params[:query]).results.inspect
 
   pages_by_file = pages.group_by(&:sketch_file_id)
   artboards_by_page = artboards.group_by(&:sketch_page_id)
@@ -175,7 +170,7 @@ end
 
 get '/status' do
   # TODO: remove
-  return json({ files: 1, in_sync: 1 })
+  # return json({ files: 1, in_sync: 1 })
   json({
     files: SketchFile.count,
     in_sync: SketchFile.in_sync.count

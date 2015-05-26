@@ -25,6 +25,6 @@ class SketchPage < ActiveRecord::Base
 
   def index
     unindex
-    self.class.connection.execute "INSERT INTO pages_fts (page_id, body) VALUES (#{id}, \"#{name}\");"
+    self.class.connection.execute "INSERT INTO pages_fts (page_id, body) VALUES (#{id}, #{self.class.sanitize(name)});"
   end
 end

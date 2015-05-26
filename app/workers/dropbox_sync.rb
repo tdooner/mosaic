@@ -15,17 +15,19 @@ class DropboxSyncWorker
       $logger.info "Mosaic contains #{dead.length} files that no longer exist"
       dead.destroy_all
 
-      results.each do |res|
-        next if res['bytes'] == 0
-        next if res['is_dir']
-        next if res['path'] =~ /conflicted copy/
+      MosaicFile.transaction do
+        results.each do |res|
+          next if res['bytes'] == 0
+          next if res['is_dir']
+          next if res['path'] =~ /conflicted copy/
 
-        sfile = klass.where(dropbox_path: res['path'].downcase).first_or_create(dropbox_rev: 'unknown')
+          sfile = klass.where(dropbox_path: res['path'].downcase).first_or_create(dropbox_rev: 'unknown')
 
-        if sfile.dropbox_rev == res['rev']
-          sfile.update_attribute(:in_sync, true)
-        else
-          sfile.enqueue_sync!
+          if sfile.dropbox_rev == res['rev']
+            sfile.update_attribute(:in_sync, true)
+          else
+            sfile.enqueue_sync!
+          end
         end
       end
     end

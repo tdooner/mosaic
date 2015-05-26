@@ -1,6 +1,6 @@
 class SketchArtboard < ActiveRecord::Base
   belongs_to :sketch_page
-
+ 
   after_create :index
   before_destroy :unindex
 
@@ -25,6 +25,6 @@ class SketchArtboard < ActiveRecord::Base
 
   def index
     unindex
-    self.class.connection.execute "INSERT INTO artboards_fts (artboard_id, body) VALUES (#{id}, \"#{name}\");"
+    self.class.connection.execute "INSERT INTO artboards_fts (artboard_id, body) VALUES (#{id}, #{self.class.sanitize(name)});"
   end
 end

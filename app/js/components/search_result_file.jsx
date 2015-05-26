@@ -26,7 +26,9 @@ var SearchResultFile = React.createClass({
           <h2 className="result-filename"><i className="fa fa-file-image-o" /> {result.basename}</h2>
           {result_info}
         </div>
-        {result.slices.map(function(slice) {
+        {result.pages.map(function(page) {
+        })}
+        {result.artboards.map(function(slice) {
           return (<SearchResultSlice slice={slice} />);
         })}
       </div>
