@@ -14,9 +14,14 @@ npm install
 webpack app/js/main.jsx -p
 wget http://sketchtool.bohemiancoding.com/sketchtool-latest.zip
 unzip sketchtool-latest.zip -d vendor
+bundle install
 
-ruby app.rb
+bundle exec ruby app.rb
 ```
 
-You will need to go through some more setup steps once you get the application
-itself running, but it will walk you through it!
+You will need to go through some more setup steps (e.g. setting up a Dropbox
+app) once you get the application itself running, but it will walk you through
+it!
+
+Once you have everything set up, you can access the Mosaic server locally at
+`http://localhost:4567`.
