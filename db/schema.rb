@@ -3,9 +3,9 @@ ActiveRecord::Schema.define do
     t.string :type
     t.string :dropbox_path
     t.string :dropbox_rev
+    t.string :local_path
     t.datetime :last_modified
     t.boolean :in_sync, default: 0, null: false
-    t.string :tag_cache
   end
 
   create_table :sketch_pages do |t|

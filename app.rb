@@ -89,57 +89,60 @@ post '/tags' do
 end
 
 post '/search' do
-  return MosaicSearch.new(params[:query]).results.inspect
-
-  pages_by_file = pages.group_by(&:sketch_file_id)
-  artboards_by_page = artboards.group_by(&:sketch_page_id)
-
-  # find the file with the most pages and artboards:
-  # arbitrarily, this rates pages that match 3x heavier than artboards that do.
-  scores_by_file_id = Hash.new(0)
-  scores_by_page_id = Hash.new(0)
-  pages_by_file.each do |file_id, pages|
-    scores_by_file_id[file_id] = 3 * pages.length
-  end
-  artboards_by_page.each do |page_id, artboards|
-    artboards.each do |artboard|
-      file_id = artboard.sketch_page.sketch_file_id
-      scores_by_file_id[file_id] += 1
-      scores_by_page_id[artboard.sketch_page_id] += 1
-    end
-  end
-
-  files = SketchFile.where(id: scores_by_file_id.keys).includes(:sketch_pages).index_by(&:id)
-
-  results = scores_by_file_id.sort_by(&:last).reverse.first(20).flat_map do |file_id, _score|
-    file = files[file_id]
-    page_results = pages_by_file.fetch(file_id, []).map do |page|
-      {
-        file: file.dropbox_path,
-        file_id: file_id,
-        last_modified: file.last_modified,
-        type: :page,
-        page: page,
-      }
-    end
-    matching_artboards = artboards_by_page.values_at(*file.sketch_pages.map(&:id)).compact.flatten
-    artboard_results = matching_artboards.map do |artboard|
-      {
-        file: file.dropbox_path,
-        file_id: file_id,
-        last_modified: file.last_modified,
-        type: :artboard,
-        artboard: artboard,
-      }
-    end
-
-    page_results + artboard_results
-  end
-
-  json({
+  json(
     search: params[:query],
-    results: results,
-  })
+    results: MosaicSearch.new(params[:query]).results,
+  )
+
+  # pages_by_file = pages.group_by(&:sketch_file_id)
+  # artboards_by_page = artboards.group_by(&:sketch_page_id)
+
+  # # find the file with the most pages and artboards:
+  # # arbitrarily, this rates pages that match 3x heavier than artboards that do.
+  # scores_by_file_id = Hash.new(0)
+  # scores_by_page_id = Hash.new(0)
+  # pages_by_file.each do |file_id, pages|
+  #   scores_by_file_id[file_id] = 3 * pages.length
+  # end
+  # artboards_by_page.each do |page_id, artboards|
+  #   artboards.each do |artboard|
+  #     file_id = artboard.sketch_page.sketch_file_id
+  #     scores_by_file_id[file_id] += 1
+  #     scores_by_page_id[artboard.sketch_page_id] += 1
+  #   end
+  # end
+
+  # files = SketchFile.where(id: scores_by_file_id.keys).includes(:sketch_pages).index_by(&:id)
+
+  # results = scores_by_file_id.sort_by(&:last).reverse.first(20).flat_map do |file_id, _score|
+  #   file = files[file_id]
+  #   page_results = pages_by_file.fetch(file_id, []).map do |page|
+  #     {
+  #       file: file.dropbox_path,
+  #       file_id: file_id,
+  #       last_modified: file.last_modified,
+  #       type: :page,
+  #       page: page,
+  #     }
+  #   end
+  #   matching_artboards = artboards_by_page.values_at(*file.sketch_pages.map(&:id)).compact.flatten
+  #   artboard_results = matching_artboards.map do |artboard|
+  #     {
+  #       file: file.dropbox_path,
+  #       file_id: file_id,
+  #       last_modified: file.last_modified,
+  #       type: :artboard,
+  #       artboard: artboard,
+  #     }
+  #   end
+
+  #   page_results + artboard_results
+  # end
+
+  # json({
+  #   search: params[:query],
+  #   results: results,
+  # })
 end
 
 # post '/search' do
@@ -184,6 +187,10 @@ get '/download/:file_id' do |file_id|
   end
 
   redirect media['url']
+end
+
+get '/debug' do
+  require 'pry';binding.pry
 end
 
 after do

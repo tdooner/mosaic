@@ -27,4 +27,13 @@ class SketchArtboard < ActiveRecord::Base
     unindex
     self.class.connection.execute "INSERT INTO artboards_fts (artboard_id, body) VALUES (#{id}, #{self.class.sanitize(name)});"
   end
+
+  def image_path(thumbnail=false)
+    safe_name = name.scan(/\w+/).join('-')
+    File.join(sketch_page.sketch_file.image_path, "#{safe_name}#{thumbnail ? '.thumb.jpg' : '.png'}")
+  end
+
+  def serializable_hash(options)
+    super.merge(image_path: image_path, thumbnail_path: image_path(true))
+  end
 end

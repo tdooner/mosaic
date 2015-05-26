@@ -7,7 +7,7 @@ const Header = require('header');
 const Status = require('status');
 const Search = require('pages/search');
 const Homepage = require('pages/homepage');
-const SketchPagePage = require('pages/sketch_page');
+const SketchPagePage = require('pages/sketch_page/index');
 
 require('./index.css');
 require('babel-core/polyfill');
@@ -46,3 +46,4 @@ const routes = (
 Router.run(routes, function(Handler) {
   React.render(<Handler />, document.body);
 });
+

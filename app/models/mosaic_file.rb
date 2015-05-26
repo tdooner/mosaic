@@ -15,6 +15,18 @@ class MosaicFile < ActiveRecord::Base
     update_all(in_sync: false)
   end
 
+  def image_path
+    File.join('images', local_path)
+  end
+
+  def serializable_hash(options)
+    options = options.dup
+    options[:methods] ||= []
+    options[:methods] << :image_path
+
+    super(options)
+  end
+
   def enqueue_sync!
     raise NotImplementedError
   end

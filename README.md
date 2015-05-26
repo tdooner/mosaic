@@ -11,7 +11,7 @@ sudo yum install sqlite-devel
 git clone -o upstream https://github.com/tdooner/mosaic.git
 cd mosaic
 npm install
-webpack app/components -p
+$(npm bin)/webpack app/components -p
 wget http://sketchtool.bohemiancoding.com/sketchtool-latest.zip
 unzip sketchtool-latest.zip -d vendor && rm sketchtool-latest.zip
 bundle install
@@ -25,3 +25,7 @@ it!
 
 Once you have everything set up, you can access the Mosaic server locally at
 `http://localhost:4567`.
+
+
+## Development Instructions
+- use `$(npm bin)/webpack app/components --watch` instead

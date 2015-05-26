@@ -6,7 +6,7 @@ class MosaicSearch
       @candidates =
         SketchArtboard.
           joins('JOIN artboards_fts ON artboards_fts.artboard_id = sketch_artboards.id').
-          where('artboards_fts.body MATCH ?', @search_tokens)
+          where('artboards_fts.body MATCH ?', @search_tokens.join(' '))
     end
 
     def group_candidates
@@ -18,7 +18,7 @@ class MosaicSearch
     def score_candidates
       @candidates.each do |file, artboards|
         score = artboards.count
-        add_result(:sketch_artboard, file, score, { artboards: artboards })
+        add_result(:sketch_artboards, file, score, { artboards: artboards })
       end
     end
   end

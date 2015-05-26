@@ -14,8 +14,11 @@ class MosaicSearch
     searchers.each(&:group_candidates)
     searchers.each(&:score_candidates)
 
+    # TODO: Combine the results in order of score, descending.
     searchers.each_with_object([]) do |searcher, results|
-      results.concat(Array(searcher.results))
+      Array(searcher.results).each do |result|
+        results.push({ result_type: result[0], file: result[1], data: result[2] })
+      end
     end
   end
 

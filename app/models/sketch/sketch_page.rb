@@ -14,9 +14,14 @@ class SketchPage < ActiveRecord::Base
 
     SketchPage.new(
       uuid: page_config['id'],
-      name: page_config['name'].downcase,
+      name: page_config['name'],
       bounds: [left, top, left + page_width, top + page_height].join(','),
     )
+  end
+
+  def image_path(thumbnail=false)
+    safe_name = name.scan(/\w+/).join('-')
+    File.join(sketch_file.image_path, 'pages', "#{safe_name}#{thumbnail ? '.thumb.jpg' : '.png'}")
   end
 
   def unindex
@@ -26,5 +31,9 @@ class SketchPage < ActiveRecord::Base
   def index
     unindex
     self.class.connection.execute "INSERT INTO pages_fts (page_id, body) VALUES (#{id}, #{self.class.sanitize(name)});"
+  end
+
+  def serializable_hash(options)
+    super.merge(image_path: image_path, thumbnail_path: image_path(true))
   end
 end

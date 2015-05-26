@@ -2,6 +2,7 @@ class DropboxSyncWorker
   def self.call
     $logger.info 'Syncronizing with Dropbox...'
 
+    # ack: klass can be: SketchFile
     MosaicFile.file_types.each do |extension, klass|
       results = DropboxWrapper.with_client do |client|
         client.search('/design', extension)
@@ -21,7 +22,13 @@ class DropboxSyncWorker
           next if res['is_dir']
           next if res['path'] =~ /conflicted copy/
 
-          sfile = klass.where(dropbox_path: res['path'].downcase).first_or_create(dropbox_rev: 'unknown')
+          sfile_directory = res['path'].downcase.gsub(/\.sketch$/, '').scan(/\w+/).join('-')
+          FileUtils.mkdir_p(File.join('images', sfile_directory))
+
+          sfile = klass.where(dropbox_path: res['path'].downcase)
+                       .first_or_create(dropbox_rev: 'unknown',
+                                        local_path: sfile_directory,
+                                       )
 
           if sfile.dropbox_rev == res['rev']
             sfile.update_attribute(:in_sync, true)

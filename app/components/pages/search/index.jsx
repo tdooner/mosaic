@@ -1,6 +1,7 @@
 const React = require('react');
 const Router = require('react-router');
-const SearchResultFile = require('search_result_file');
+const SearchResultSketchArtboards = require('search_result_sketch_artboards');
+const SearchResultSketchPages = require('search_result_sketch_pages');
 
 require('whatwg-fetch');
 
@@ -43,10 +44,28 @@ const Search = React.createClass({
   },
 
   render() {
+    var resultTypeToClass = {
+      'sketch_pages': SearchResultSketchPages,
+      'sketch_artboards': SearchResultSketchArtboards
+    };
+
+    var renderResult = function(result) {
+      var basename = result['file']['dropbox_path'].split('/').pop();
+      return (
+        <div className="result-file row">
+          <div className="result-filename-container">
+            <h2 className="result-filename" title={result['file']['dropbox_path']}>
+              <i className="fa fa-file-image-o" />{' '}{basename}
+            </h2>
+          </div>
+          {React.createElement(resultTypeToClass[result['result_type']], { data: result['data'] })}
+        </div>
+      );
+    }
+
     return (
       <div>
-        {this.state.results.map(result =>
-          <SearchResultFile result={result} key={result.file_id} />)}
+        {this.state.results.map(renderResult)}
       </div>
     );
   }

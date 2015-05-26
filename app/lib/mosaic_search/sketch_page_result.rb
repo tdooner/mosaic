@@ -6,8 +6,7 @@ class MosaicSearch
       @candidates = 
         SketchPage.
           joins('JOIN pages_fts ON pages_fts.page_id = sketch_pages.id').
-          where('pages_fts.body MATCH ?', @search_tokens)
-
+          where('pages_fts.body MATCH ?', @search_tokens.join(' '))
     end
 
     def group_candidates
@@ -16,7 +15,7 @@ class MosaicSearch
 
     def score_candidates
       @candidates.each do |file, pages|
-        add_result(:sketch_page, file, 3 * pages.count, { pages: pages })
+        add_result(:sketch_pages, file, 3 * pages.count, { pages: pages })
       end
     end
   end
