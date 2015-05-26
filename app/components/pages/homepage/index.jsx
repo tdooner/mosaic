@@ -1,9 +1,9 @@
-var React = require('react');
+const React = require('react');
 
-var Homepage = React.createClass({
-  render: function() {
+const Homepage = React.createClass({
+  render() {
     return (
-      <div className="row" id="no-results">
+      <div className="row">
         <div className="col-xs-12">
           <h2>Welcome to Mosaic</h2>
           <span style={{fontSize: '96px'}}>

@@ -1,27 +1,29 @@
-var React = require('react'),
-    Router = require('react-router'),
-    DefaultRoute = Router.DefaultRoute,
-    RouteHandler = Router.RouteHandler,
-    Route = Router.Route,
-    Header = require('./components/header.jsx'),
-    Status = require('./components/status.jsx'),
-    Search = require('./pages/search.jsx'),
-    Homepage = require('./pages/homepage.jsx');
+const React = require('react');
+const Router = require('react-router');
+const DefaultRoute = Router.DefaultRoute;
+const RouteHandler = Router.RouteHandler;
+const Route = Router.Route;
+const Header = require('header');
+const Status = require('status');
+const Search = require('pages/search');
+const Homepage = require('pages/homepage');
 
-var App = React.createClass({
+require('./index.css');
+require('babel-core/polyfill');
+
+const App = React.createClass({
   contextTypes: {
     router: React.PropTypes.func
   },
 
-  getInitialState: function() {
+  getInitialState() {
     return { initialQuery: this.context.router.getCurrentParams().query };
   },
 
-  render: function() {
+  render() {
     return (
       <div>
         <Header initialQuery={this.state.initialQuery} />
-        <div id="search-container-spacer" />
         <div className="container">
           <RouteHandler />
           <Status />
@@ -31,7 +33,7 @@ var App = React.createClass({
   }
 });
 
-var routes = (
+const routes = (
   <Route name="app" path="/" handler={App}>
     <Route name="search" path=":query" handler={Search} />
 

@@ -11,7 +11,7 @@ sudo yum install sqlite-devel
 git clone -o upstream https://github.com/tdooner/mosaic.git
 cd mosaic
 npm install
-webpack app/js/main.jsx -p
+webpack app/components -p
 wget http://sketchtool.bohemiancoding.com/sketchtool-latest.zip
 unzip sketchtool-latest.zip -d vendor
 bundle install
