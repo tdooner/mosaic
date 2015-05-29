@@ -21,7 +21,7 @@ const SearchResultFile = React.createClass({
           {' ' + moment(result.last_modified).fromNow()}
           {' \u00b7 '}
           {(result.tags.length > 0) && result.tags.join(',')}
-          <a target='_new' href={`/download/${result.file_id}`}>
+          <a target='_blank' href={`/download/${result.file_id}`}>
             Download from Dropbox
           </a>
         </div>
